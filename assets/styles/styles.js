@@ -33,7 +33,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   content: {
-    padding: 5,
+    paddingVertical: 7,
+    paddingHorizontal: 10,
     borderRadius: 5,
     borderColor: "#e0e0e0",
     backgroundColor: "#f0f0f0",
@@ -45,24 +46,21 @@ const styles = StyleSheet.create({
   h1: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "black"
   },
   h2: {
     fontSize: 15,
     fontWeight: "bold",
-    color: "black"
   },
   h3: {
     fontSize: 13,
     fontWeight: "bold",
-    color: "black"
   },
   titleContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 2,
-    paddingHorizontal: 5
+    // paddingVertical: 2,
+    // paddingHorizontal: 5
   },
   networkSwitch: {
     flexDirection: "row",
@@ -79,7 +77,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    padding: 5,
+    marginTop: 5,
     gap: 4
   },
   input: {
@@ -88,7 +86,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     padding: 5,
-    height: 32
+    height: 32,
+    color: 'black',
   },
   btn: {
     backgroundColor: "#fefefe",
@@ -99,7 +98,6 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: 'center',
     justifyContent: 'center',
-    aspectRatio: 1,
     borderRadius: 4,
     elevation: 3,
     fontWeight: 600,

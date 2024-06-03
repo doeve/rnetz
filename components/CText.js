@@ -4,7 +4,7 @@ import React, { Component } from "react";
 export default class CText extends Component {
   constructor(props) {
     super(props);
-    this.style = [{ fontFamily: "Courier New" }];
+    this.style = [{ fontFamily: "Courier New", color: "#0a0a0a" }];
     if (props.style) {
       if (Array.isArray(props.style)) {
         this.style = this.style.concat(props.style);
