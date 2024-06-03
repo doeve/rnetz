@@ -30,7 +30,7 @@ const App = () => {
         >
           <Stack.Screen name="Dashboard" component={Container(Dashboard)} />
           <Stack.Screen name="Device" component={Container(Device)} />
-          <Stack.Screen name="Details" component={Container(Details)} />
+          <Stack.Screen name="Details" component={Container(Details)}/>
         </Stack.Navigator>
       </SafeAreaView>
     </NavigationContainer>

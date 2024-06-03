@@ -5,9 +5,7 @@ import styles from "../assets/styles/styles";
 const Container = (Component) => (props) => {
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
-        <Component {...props} />
-      </View>
+      <Component {...props} />
     </View>
   );
 };

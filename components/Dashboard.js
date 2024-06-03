@@ -36,12 +36,8 @@ const Dashboard = () => {
   useEffect(() => {
     if (isLocal) {
       // Fetch and set local network IP and mask
-      NetInfo.fetch().then((state) => {
-        if (state.isConnected) {
-          // For demonstration, use placeholder values
-          setIp("192.168.1.1");
-          setMask("/24");
-        }
+      NetworkInfo.getSubnet().then(subnet => {
+        console.log(subnet);
       });
     } else {
       setIp("");
@@ -87,10 +83,10 @@ const Dashboard = () => {
   };
 
   const ShowIp = async () => {
-    NetworkInfo.getIPAddress().then(ipAddress => {
-      console.log(ipAddress);
+    NetworkInfo.getIPV4Address().then(ipv4Address => {
+      console.log(ipv4Address);
       ToastAndroid.showWithGravityAndOffset(
-        ipAddress,
+        ipv4Address,
         ToastAndroid.SHORT,
         ToastAndroid.BOTTOM,
         25,
@@ -100,8 +96,9 @@ const Dashboard = () => {
   }
 
   return (
-    <View>
-      <View style={styles.networkContainer}>
+    <View style={{flexDirection: "column", gap: 10, height: "100%"}}>
+    <View style={styles.content}>
+      <View style={styles.titleContainer}>
         <Text style={styles.h2}>network</Text>
         <View style={styles.networkSwitch}>
           <Pressable onPress={handleSwitchToggle}>
@@ -148,6 +145,12 @@ const Dashboard = () => {
         title="Go to Device"
         onPress={() => navigation.navigate("Device")}
       />
+    </View>
+    <View style={{...styles.content, ...{flexGrow: 1}}}>
+      <View style={styles.titleContainer}>
+        <Text>devices</Text>
+      </View>
+    </View>
     </View>
   );
 };

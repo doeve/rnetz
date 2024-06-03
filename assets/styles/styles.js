@@ -39,19 +39,25 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
     borderWidth: 1
   },
+  devices: {
+    
+  },
   h1: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "black"
   },
   h2: {
     fontSize: 15,
     fontWeight: "bold",
+    color: "black"
   },
   h3: {
     fontSize: 13,
     fontWeight: "bold",
+    color: "black"
   },
-  networkContainer: {
+  titleContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
