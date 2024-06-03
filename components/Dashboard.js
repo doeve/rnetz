@@ -25,6 +25,7 @@ import Icon from 'react-native-vector-icons/Ionicons'
 
 
 import NetInfo from "@react-native-community/netinfo";
+import {NetworkInfo} from 'react-native-network-info';
 
 const Dashboard = () => {
   const navigation = useNavigation();
@@ -85,6 +86,12 @@ const Dashboard = () => {
     scanner.start();
   };
 
+  const ShowIp = async () => {
+    NetworkInfo.getIPAddress().then(ipAddress => {
+      console.log(ipAddress);
+    });
+  }
+
   return (
     <View>
       <View style={styles.networkContainer}>
@@ -126,6 +133,10 @@ const Dashboard = () => {
           <Icon name="caret-forward-outline" size={20} color="black" />
         </TouchableOpacity>
       </View>
+      <Button
+        title="ip"
+        onPress={ShowIp}
+      />
       <Button
         title="Go to Device"
         onPress={() => navigation.navigate("Device")}
