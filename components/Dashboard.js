@@ -97,7 +97,7 @@ const Dashboard = () => {
               onPress={handleSwitchToggle}
             />
           </Pressable>
-          <Switch value={isLocal} onValueChange={handleSwitchToggle} />
+          <Switch value={!isLocal} onValueChange={handleSwitchToggle} />
           <Pressable onPress={handleSwitchToggle}>
             <Image
               source={require("../assets/images/outer-network.png")}
@@ -112,14 +112,14 @@ const Dashboard = () => {
           style={{...styles.input, ...styles.ipInput}}
           value={ip}
           onChangeText={setIp}
-          editable={isLocal}
+          editable={!isLocal}
           placeholder="IP Address"
         />
         <TextInput
           style={{...styles.input, ...styles.maskInput}}
           value={mask}
           onChangeText={setMask}
-          editable={isLocal}
+          editable={!isLocal}
           placeholder="Mask"
         />
         <TouchableOpacity style={styles.btn} onPress={handlePing}>
