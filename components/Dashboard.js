@@ -89,6 +89,13 @@ const Dashboard = () => {
   const ShowIp = async () => {
     NetworkInfo.getIPAddress().then(ipAddress => {
       console.log(ipAddress);
+      ToastAndroid.showWithGravityAndOffset(
+        ipAddress,
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+        25,
+        50,
+      );
     });
   }
 
