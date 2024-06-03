@@ -35,8 +35,9 @@ const styles = StyleSheet.create({
   content: {
     padding: 5,
     borderRadius: 5,
-    borderColor: "#fefefe",
-    backgroundColor: "#efefef",
+    borderColor: "#e0e0e0",
+    backgroundColor: "#f0f0f0",
+    borderWidth: 1
   },
   h1: {
     fontSize: 18,
@@ -54,14 +55,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    
     paddingVertical: 2,
-    paddingHorizontal: 5,
-    // padding: 10,
+    paddingHorizontal: 5
   },
   networkSwitch: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
     gap: 5
   },
   smallIcon: {
@@ -73,34 +73,31 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    padding: 5,  //TODO
+    padding: 5,
     gap: 4
   },
   input: {
-    backgroundColor: "#f1f1f1",
-    borderColor: "#fefefe",
+    backgroundColor: "#fefefe",
+    borderColor: "#aeaeae",
     borderWidth: 1,
     borderRadius: 5,
     padding: 5,
-    // flex: 1,
     height: 32
   },
   btn: {
-    backgroundColor: "#f1f1f1",
-    borderColor: "#fefefe",
+    backgroundColor: "#fefefe",
+    borderColor: "#aeaeae",
     borderWidth: 1,
     padding: 5,
     height: 32,
     display: "flex",
-    
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
     aspectRatio: 1,
     borderRadius: 4,
     elevation: 3,
-    fontWeight: 600
-    // backgroundColor: 'black',
+    fontWeight: 600,
+    color: "black"
   },
   formRow: {
     width: "100%",

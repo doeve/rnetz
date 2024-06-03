@@ -6,13 +6,15 @@ import {
   Image,
   Switch,
   TouchableOpacity,
-  Pressable
+  Pressable,
+  ToastAndroid
 } from "react-native";
 import Text from "./CText";
 import { useNavigation } from "@react-navigation/native";
 import styles from "../assets/styles/styles";
 // import Zeroconf from 'react-native-zeroconf'
 import PortScanner from 'react-native-find-local-devices';
+import Icon from 'react-native-vector-icons/Ionicons'
 
 
 // import CustomToast from "@fredabila/customtoast";
@@ -50,46 +52,16 @@ const Dashboard = () => {
     setIsLocal(!isLocal);
     console.log(isLocal);
     const message = isLocal ? "Outer network" : "Local network";
-    // CustomToast.showToast(message, 3000);
+    ToastAndroid.showWithGravityAndOffset(
+      message,
+      ToastAndroid.SHORT,
+      ToastAndroid.BOTTOM,
+      25,
+      50,
+    );
   };
 
   const handlePing = async () => {
-    // fetch(ip, { method: "HEAD" })
-    //   .then((response) => {
-    //     if (response.ok) {
-    //       // CustomToast.showToast("Network found", 3000);
-    //       console.log('Ip found on network');
-    //       console.log(response);
-    //     } else {
-    //       // throw new Error("Network not found");
-    //       console.log('Ip not found on network');
-    //     }
-    //   })
-    //   .catch(() => {
-    //     // CustomToast.showToast("Network not found", 3000);
-    //   });
-
-    //   try {
-    //     /**
-    //      *
-    //      * Get RTT (Round-trip delay time)
-    //      *
-    //      * @static
-    //      * @param {string} ipAddress - For example : 8.8.8.8
-    //      * @param {Object} option - Some optional operations
-    //      * @param {number} option.timeout - timeout
-    //      * @returns
-    //      * @memberof Ping
-    //      */
-    //     // const ms = await Ping.start(ip,{ timeout: 1000 });
-    //     console.log(ms);
-    //   } catch (error) {
-    //     console.log('special code',error.code, error.message);
-    //   }
-    // find().then(devices => {
-    //   console.log(devices);
-    //   // console.log
-    // });
     const scanner = new PortScanner({
       timeout: 40,
       ports: [8000],
@@ -151,7 +123,7 @@ const Dashboard = () => {
           placeholder="Mask"
         />
         <TouchableOpacity style={styles.btn} onPress={handlePing}>
-          <Text>→</Text>
+          <Icon name="caret-forward-outline" size={20} color="black" />
         </TouchableOpacity>
       </View>
       <Button
