@@ -28,6 +28,7 @@ export default Dashboard = () => {
   const [ip, setIp] = useState("");
   const [mask, setMask] = useState("");
   const [devices, setDevices] = useState([]);
+  const [scanning, setScanning] = useState(false);
   const { ParallelPing } = NativeModules;
   const eventEmitter = new NativeEventEmitter(ParallelPing);
 
@@ -178,15 +179,15 @@ export default Dashboard = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <Button
+      {/* <Button
         title="ip"
         onPress={ShowIp}
-      />
-      <Button
+      /> */}
+      {/* <Button
         title="Go to Device"
         onPress={() => navigation.navigate("Device")}
-      />
-      <View style={{...styles.content, ...{flexGrow: 1, flexDirection: "column"}}}>
+      /> */}
+      <View style={{...styles.content, ...{flex: 1, flexDirection: "column"}}}>
         <View style={{...styles.titleContainer, ...{marginBottom: 7}}}>
           <Text style={styles.h2}>devices{devices.length? ` (${devices.length})` : ''}</Text>
         </View>
