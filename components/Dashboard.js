@@ -18,7 +18,6 @@ import DeviceRow from "./DeviceRow";
 import { useNavigation } from "@react-navigation/native";
 import styles from "../assets/styles/styles";
 import Icon from "react-native-vector-icons/Ionicons"
-// import Ping from "react-native-ping";
 import {NetworkInfo} from "react-native-network-info";
 
 LogBox.ignoreLogs(['new NativeEventEmitter']);
