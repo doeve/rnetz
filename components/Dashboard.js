@@ -8,14 +8,16 @@ import {
   TouchableOpacity,
   Pressable,
   ToastAndroid,
-  ScrollView
+  ScrollView,
+  NativeModules,
+  NativeEventEmitter
 } from "react-native";
 import Text from "./CText";
 import DeviceRow from "./DeviceRow";
 import { useNavigation } from "@react-navigation/native";
 import styles from "../assets/styles/styles";
 import Icon from "react-native-vector-icons/Ionicons"
-import Ping from "react-native-ping";
+// import Ping from "react-native-ping";
 
 
 import {NetworkInfo} from "react-native-network-info";
@@ -27,6 +29,8 @@ export default Dashboard = () => {
   const [mask, setMask] = useState("");
   const [devices, setDevices] = useState([]);
   const [scanning, setScanning] = useState(false);
+  const { ParallelPing } = NativeModules;
+  const eventEmitter = new NativeEventEmitter(ParallelPing);
 
   const subnetToCIDR = (subnet) => {
     const octets = subnet.split('.').map(Number);
@@ -34,6 +38,29 @@ export default Dashboard = () => {
     const cidr = binaryString.split('1').length - 1;
     return '/' + cidr;
   }
+
+  const generateHostIPs = (ip, mask) => {
+    const chunks = ip.split('.');
+    const maskBits = 32 - parseInt(mask.slice(1), 10);
+    const totalHosts = Math.pow(2, maskBits) - 2; 
+    const hostIPs = [];
+
+    const networkInt = chunks.reduce((acc, val) => (acc << 8) + parseInt(val, 10), 0);
+
+    for (let i = 1; i <= totalHosts; i++) {
+        const hostInt = networkInt + i;
+        const hostIP = [
+            (hostInt >> 24) & 255,
+            (hostInt >> 16) & 255,
+            (hostInt >> 8) & 255,
+            hostInt & 255
+        ].join('.');
+        hostIPs.push(hostIP);
+    }
+
+    return hostIPs;
+  }
+
 
   const generateNetworkAddress  = (ip, mask) => {
     const ipParts = ip.split('.').map(Number);
@@ -52,40 +79,19 @@ export default Dashboard = () => {
     return networkAddressParts.join('.');
   }
 
-  const scanAllIPs = async () =>  {
-    setScanning(!scanning);
-    console.log(scanning);
-    if (scanning) {
-      console.log('scanning');
-      const maskBits = 32 - parseInt(mask.slice(1), 10);
-      const maskValue = (1 << maskBits) - 1;
-      const networkIp = generateNetworkAddress(ip, mask);
-      const networkValue = networkIp.split('.').reduce((acc, val) => (acc << 8) | Number(val), 0);
-
-      for (let i = 1; i < (1 << maskBits) - 1; i++) {
-        const ipValue = networkValue + i;
-        const ipParts = [
-          (ipValue >> 24) & 255,
-          (ipValue >> 16) & 255,
-          (ipValue >> 8) & 255,
-          ipValue & 255
-        ];
-        const ipAddress = ipParts.join('.');
-        if (scanning) {
-          try {
-            const ms = await Ping.start(ipAddress, { timeout: 1000 });
-            console.log([...devices, ipAddress]);
-            setDevices([...devices, ipAddress]);
-            // console.log(devices);
-          } catch (error) {
-            console.log(i, ipAddress,' special code',error.code, error.message);
-          }
-        } else {
-          break;
-        }
-      }
-    }
+  const scanAllIPs = async () => {
+    ParallelPing.pingHosts(generateHostIPs(generateNetworkAddress(ip, mask), mask), 3);
   }
+
+  useEffect(() => {
+    const pingSuccessListener = eventEmitter.addListener('PingSuccess', (event) => {
+      setDevices(prevDevices => [...prevDevices, event.host]);
+    });
+  
+    return () => {
+      pingSuccessListener.remove(); // Remove listener
+    };
+  }, []);
 
   useEffect(() => {
     if (isLocal) {
@@ -100,6 +106,15 @@ export default Dashboard = () => {
       setMask("");
     }
   }, [isLocal]);
+
+  // useEffect(async () => {
+  //   try {
+  //     const ms = await Ping.start(ipAddress, { timeout: 1000 });
+  //     console.log([...devices, ipAddress]);
+  //   } catch (error) {
+  //     console.log(i, ipAddress,' special code',error.code, error.message);
+  //   }
+  // }, [devices]);
   
   const handleSwitchToggle = () => {
     setIsLocal(!isLocal);
@@ -184,7 +199,7 @@ export default Dashboard = () => {
         <View style={{...styles.titleContainer, ...{marginBottom: 7}}}>
           <Text style={styles.h2}>devices{devices.length? ` (${devices.length})` : ''}</Text>
         </View>
-        <ScrollView style={{flexGrow: 1}}>
+        <ScrollView style={{flexGrow: 1, flexDirection: "column", gap: 5}}>
           {devices.length? devices.map((ip, i) => {
             return (
               <DeviceRow ip={ip} key={i}/>
