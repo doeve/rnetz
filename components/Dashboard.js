@@ -18,7 +18,7 @@ import DeviceRow from "./DeviceRow";
 import { useNavigation } from "@react-navigation/native";
 import styles from "../assets/styles/styles";
 import Icon from "react-native-vector-icons/Ionicons"
-import {NetworkInfo} from "react-native-network-info";
+import { NetworkInfo } from "react-native-network-info";
 
 LogBox.ignoreLogs(['new NativeEventEmitter']);
 
@@ -29,6 +29,7 @@ export default Dashboard = () => {
   const [mask, setMask] = useState("");
   const [devices, setDevices] = useState([]);
   const [scanning, setScanning] = useState(false);
+  const [scanned, setScanned] = useState(0);
   const { ParallelPing } = NativeModules;
   const eventEmitter = new NativeEventEmitter(ParallelPing);
 
@@ -42,27 +43,27 @@ export default Dashboard = () => {
   const generateHostIPs = (ip, mask) => {
     const chunks = ip.split('.');
     const maskBits = 32 - parseInt(mask.slice(1), 10);
-    const totalHosts = Math.pow(2, maskBits) - 2; 
+    const totalHosts = Math.pow(2, maskBits) - 2;
     const hostIPs = [];
 
     const networkInt = chunks.reduce((acc, val) => (acc << 8) + parseInt(val, 10), 0);
 
     for (let i = 1; i <= totalHosts; i++) {
-        const hostInt = networkInt + i;
-        const hostIP = [
-            (hostInt >> 24) & 255,
-            (hostInt >> 16) & 255,
-            (hostInt >> 8) & 255,
-            hostInt & 255
-        ].join('.');
-        hostIPs.push(hostIP);
+      const hostInt = networkInt + i;
+      const hostIP = [
+        (hostInt >> 24) & 255,
+        (hostInt >> 16) & 255,
+        (hostInt >> 8) & 255,
+        hostInt & 255
+      ].join('.');
+      hostIPs.push(hostIP);
     }
 
     return hostIPs;
   }
 
 
-  const generateNetworkAddress  = (ip, mask) => {
+  const generateNetworkAddress = (ip, mask) => {
     const ipParts = ip.split('.').map(Number);
     const maskBits = 32 - parseInt(mask.slice(1), 10);
     const maskValue = (1 << maskBits) - 1;
@@ -80,15 +81,19 @@ export default Dashboard = () => {
   }
 
   const scanAllIPs = async () => {
+    setScanned(0);
     setDevices([]);
     ParallelPing.pingHosts(generateHostIPs(generateNetworkAddress(ip, mask), mask), 3);
   }
 
   useEffect(() => {
-    const pingSuccessListener = eventEmitter.addListener('PingSuccess', (event) => {
-      setDevices(prevDevices => [...prevDevices, event.host]);
+    const pingSuccessListener = eventEmitter.addListener('pinged', (event) => {
+      setScanned(prevScanned => prevScanned + 1);
+      if (event.exitValue === 0) {
+        setDevices(prevDevices => [...prevDevices, event.host]);
+      }
     });
-  
+
     return () => {
       pingSuccessListener.remove();
     };
@@ -107,7 +112,7 @@ export default Dashboard = () => {
       setMask("");
     }
   }, [isLocal]);
-  
+
   const handleSwitchToggle = () => {
     setIsLocal(!isLocal);
     console.log(isLocal);
@@ -120,6 +125,11 @@ export default Dashboard = () => {
       50,
     );
   };
+
+  const calculateNumberOfHosts = (mask) => {
+    const subnet = parseInt(mask.slice(1), 10);
+    return Math.pow(2, 32 - subnet) - 2;
+  }
 
   const ShowIp = async () => {
     NetworkInfo.getIPV4Address().then(ipv4Address => {
@@ -135,7 +145,7 @@ export default Dashboard = () => {
   }
 
   return (
-    <View style={{flexDirection: "column", gap: 10, height: "100%"}}>
+    <View style={{ flexDirection: "column", gap: 10, height: "100%" }}>
       <View style={styles.content}>
         <View style={styles.titleContainer}>
           <Text style={styles.h2}>network</Text>
@@ -159,22 +169,22 @@ export default Dashboard = () => {
         </View>
         <View style={styles.inputContainer}>
           <TextInput
-            style={{...styles.input, ...styles.ipInput}}
-            value={!ip? '' : generateNetworkAddress(ip, mask)}
+            style={{ ...styles.input, ...styles.ipInput }}
+            value={!ip ? '' : generateNetworkAddress(ip, mask)}
             onChangeText={setIp}
             editable={!isLocal}
             placeholder="enter network ip"
             placeholderTextColor="#606060"
           />
           <TextInput
-            style={{...styles.input, ...styles.maskInput}}
+            style={{ ...styles.input, ...styles.maskInput }}
             value={mask}
             onChangeText={setMask}
             editable={!isLocal}
             placeholder="mask"
-            placeholderTextColor="#606060" 
+            placeholderTextColor="#606060"
           />
-          <TouchableOpacity style={{...styles.btn, ...{aspectRatio: 1}}} onPress={scanAllIPs}>
+          <TouchableOpacity style={{ ...styles.btn, ...{ aspectRatio: 1 } }} onPress={scanAllIPs}>
             <Icon name="caret-forward-outline" size={20} color="black" />
           </TouchableOpacity>
         </View>
@@ -187,16 +197,17 @@ export default Dashboard = () => {
         title="Go to Device"
         onPress={() => navigation.navigate("Device")}
       /> */}
-      <View style={{...styles.content, ...{flex: 1, flexDirection: "column"}}}>
-        <View style={{...styles.titleContainer, ...{marginBottom: 7}}}>
-          <Text style={styles.h2}>devices{devices.length? ` (${devices.length})` : ''}</Text>
+      <View style={{ ...styles.content, ...{ flex: 1, flexDirection: "column" } }}>
+        <View style={{ ...styles.titleContainer, ...{ marginBottom: 7 } }}>
+          <Text style={styles.h2}>devices{devices.length ? ` (${devices.length})` : ''}</Text>
+          <Text style={styles.h3}>{scanned} / {calculateNumberOfHosts(mask)}</Text>
         </View>
-        <ScrollView contentContainerStyle={{rowGap: 5}}>
-          {devices.length? devices.map((ip, i) => {
+        <ScrollView contentContainerStyle={{ rowGap: 5 }}>
+          {devices.length ? devices.map((ip, i) => {
             return (
-              <DeviceRow ip={ip} key={i}/>
+              <DeviceRow ip={ip} key={i} />
             );
-          }) : <Text>scan the network</Text>}
+          }) : <View style={{height: 100, width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "center"}}><Text>scan the network</Text></View>}
         </ScrollView>
       </View>
     </View>

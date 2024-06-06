@@ -47,11 +47,10 @@ public class ParallelPingModule extends ReactContextBaseJavaModule {
                 try {
                     Process process = Runtime.getRuntime().exec(String.format("ping -c %d %s", count, host));
                     int exitValue = process.waitFor();
-                    if (exitValue == 0) {
-                        WritableMap params = Arguments.createMap();
-                        params.putString("host", host);
-                        sendEvent(getReactApplicationContext(), "PingSuccess", params);
-                    }
+                    WritableMap params = Arguments.createMap();
+                    params.putString("host", host);
+                    params.putInt("exitValue", exitValue);
+                    sendEvent(getReactApplicationContext(), "pinged", params);
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
