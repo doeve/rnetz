@@ -10,7 +10,8 @@ import {
   ToastAndroid,
   ScrollView,
   NativeModules,
-  NativeEventEmitter
+  NativeEventEmitter,
+  LogBox
 } from "react-native";
 import Text from "./CText";
 import DeviceRow from "./DeviceRow";
@@ -18,9 +19,9 @@ import { useNavigation } from "@react-navigation/native";
 import styles from "../assets/styles/styles";
 import Icon from "react-native-vector-icons/Ionicons"
 // import Ping from "react-native-ping";
-
-
 import {NetworkInfo} from "react-native-network-info";
+
+LogBox.ignoreLogs(['new NativeEventEmitter']);
 
 export default Dashboard = () => {
   const navigation = useNavigation();
@@ -28,7 +29,6 @@ export default Dashboard = () => {
   const [ip, setIp] = useState("");
   const [mask, setMask] = useState("");
   const [devices, setDevices] = useState([]);
-  const [scanning, setScanning] = useState(false);
   const { ParallelPing } = NativeModules;
   const eventEmitter = new NativeEventEmitter(ParallelPing);
 
@@ -80,6 +80,7 @@ export default Dashboard = () => {
   }
 
   const scanAllIPs = async () => {
+    setDevices([]);
     ParallelPing.pingHosts(generateHostIPs(generateNetworkAddress(ip, mask), mask), 3);
   }
 
@@ -89,7 +90,7 @@ export default Dashboard = () => {
     });
   
     return () => {
-      pingSuccessListener.remove(); // Remove listener
+      pingSuccessListener.remove();
     };
   }, []);
 
@@ -106,15 +107,6 @@ export default Dashboard = () => {
       setMask("");
     }
   }, [isLocal]);
-
-  // useEffect(async () => {
-  //   try {
-  //     const ms = await Ping.start(ipAddress, { timeout: 1000 });
-  //     console.log([...devices, ipAddress]);
-  //   } catch (error) {
-  //     console.log(i, ipAddress,' special code',error.code, error.message);
-  //   }
-  // }, [devices]);
   
   const handleSwitchToggle = () => {
     setIsLocal(!isLocal);
@@ -183,7 +175,7 @@ export default Dashboard = () => {
             placeholderTextColor="#606060" 
           />
           <TouchableOpacity style={{...styles.btn, ...{aspectRatio: 1}}} onPress={scanAllIPs}>
-            <Icon name={scanning? "stop" : "caret-forward-outline"} size={20} color="black" />
+            <Icon name="caret-forward-outline" size={20} color="black" />
           </TouchableOpacity>
         </View>
       </View>
@@ -199,7 +191,7 @@ export default Dashboard = () => {
         <View style={{...styles.titleContainer, ...{marginBottom: 7}}}>
           <Text style={styles.h2}>devices{devices.length? ` (${devices.length})` : ''}</Text>
         </View>
-        <ScrollView style={{flexGrow: 1, flexDirection: "column", gap: 5}}>
+        <ScrollView contentContainerStyle={{rowGap: 5}}>
           {devices.length? devices.map((ip, i) => {
             return (
               <DeviceRow ip={ip} key={i}/>

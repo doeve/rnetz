@@ -1,6 +1,5 @@
 package com.rnetz;
 
-import android.util.Log;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -58,8 +57,5 @@ public class ParallelPingModule extends ReactContextBaseJavaModule {
                 }
             }).start();
         }
-    }
-    
-    public void removeListeners(int count) {
     }
 }
