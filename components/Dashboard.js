@@ -202,23 +202,15 @@ export default Dashboard = () => {
           </TouchableOpacity>
         </View>
       </View>
-      {/* <Button
-        title="ip"
-        onPress={ShowIp}
-      /> */}
-      {/* <Button
-        title="Go to Device"
-        onPress={() => navigation.navigate("Device")}
-      /> */}
       <View style={{ ...styles.content, flex: 1, flexDirection: "column" }}>
         <View style={{ ...styles.titleContainer,  marginBottom: 7 }}>
           <Text style={styles.h2}>devices{Object.keys(devices).length ? ` (${Object.keys(devices).length})` : ''}</Text>
           <Text style={styles.h3}>{scanned} / {calculateNumberOfHosts(mask)}</Text>
         </View>
         <ScrollView contentContainerStyle={{ rowGap: 5, flexGrow: 1 }}>
-          {Object.keys(devices).length ? Object.entries(devices).map(([ip, name]) => {
+          {Object.keys(devices).length ? Object.entries(devices).map(([deviceIp, deviceName]) => {
             return (
-              <DeviceRow ip={ip} key={ip} name={name}/>
+              <DeviceRow ip={deviceIp} key={deviceIp} name={deviceName + (deviceIp === ip? " (You)" : "")}/>
             );
           }) : <View style={{height: 100, width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "center"}}><Text>scan the network</Text></View>}
         </ScrollView>
