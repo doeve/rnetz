@@ -92,7 +92,7 @@ export default Dashboard = () => {
       setScanned(prevScanned => prevScanned + 1);
       if (event.exitValue === 0) {
         setDevices(prevDevices => ({...prevDevices, [event.ip]: event.name}));
-        // const client = new Client();
+        // const client = new Client();-+
 
         // client.on('response', (headers, statusCode, rinfo) => {
         //   if (rinfo.address === event.ip) {
@@ -197,7 +197,7 @@ export default Dashboard = () => {
             placeholder="mask"
             placeholderTextColor="#606060"
           />
-          <TouchableOpacity style={{ ...styles.btn, aspectRatio: 1 }} onPress={scanAllIPs}>
+          <TouchableOpacity style={{ ...styles.smBtn, aspectRatio: 1 }} onPress={scanAllIPs}>
             <Icon name="caret-forward-outline" size={20} color="black" />
           </TouchableOpacity>
         </View>
@@ -212,10 +212,10 @@ export default Dashboard = () => {
       /> */}
       <View style={{ ...styles.content, flex: 1, flexDirection: "column" }}>
         <View style={{ ...styles.titleContainer,  marginBottom: 7 }}>
-          <Text style={styles.h2}>devices{devices.length ? ` (${devices.length})` : ''}</Text>
+          <Text style={styles.h2}>devices{Object.keys(devices).length ? ` (${Object.keys(devices).length})` : ''}</Text>
           <Text style={styles.h3}>{scanned} / {calculateNumberOfHosts(mask)}</Text>
         </View>
-        <ScrollView contentContainerStyle={{ rowGap: 5 }}>
+        <ScrollView contentContainerStyle={{ rowGap: 5, flexGrow: 1 }}>
           {Object.keys(devices).length ? Object.entries(devices).map(([ip, name]) => {
             return (
               <DeviceRow ip={ip} key={ip} name={name}/>

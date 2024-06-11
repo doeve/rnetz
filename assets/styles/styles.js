@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     height: 32,
     color: 'black',
   },
-  btn: {
+  smBtn: {
     backgroundColor: "#fefefe",
     borderColor: "#aeaeae",
     borderWidth: 1,
@@ -101,6 +101,19 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     elevation: 3,
     fontWeight: 600,
+    color: "black"
+  },
+  lgBtn: {
+    flexDirection: "row", 
+    justifyContent: "space-between",
+    height: 40,
+    paddingHorizontal: 10,
+    backgroundColor: "#f4f4f4",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 4,
+    elevation: 3,
+    borderColor: "#a0a0a0",
     color: "black"
   },
   formRow: {

@@ -9,7 +9,7 @@ export default DeviceRow = (props) => {
   const navigation = useNavigation();
 
   return (
-    <TouchableOpacity style={{ ...styles.btn, ...{flexDirection: "row", justifyContent: "space-between", height: 40, paddingHorizontal: 10, backgroundColor: "#eeeeee", alignItems: "center", border: 1, borderColor: "#a0a0a0"}}} onPress={() => navigation.navigate("Device", props.ip)}>
+    <TouchableOpacity style={{ ...styles.lgBtn, justifyContent: "space-between"}} onPress={() => navigation.navigate("Device", props)}>
       <View style={{ flexDirection: "column"}}>
         <Text style={{ fontWeight: 700, fontSize: 15 }}>{props.name}</Text>
         {props.name !== props.ip && <Text style={{ fontSize: 10, marginBottom: 2 }}>{props.ip}</Text>}
