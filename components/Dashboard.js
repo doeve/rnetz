@@ -19,6 +19,7 @@ import { useNavigation } from "@react-navigation/native";
 import styles from "../assets/styles/styles";
 import Icon from "react-native-vector-icons/Ionicons"
 import { NetworkInfo } from "react-native-network-info";
+import { Client } from "react-native-ssdp"
 
 LogBox.ignoreLogs(['new NativeEventEmitter']);
 
@@ -90,7 +91,19 @@ export default Dashboard = () => {
     const pingSuccessListener = eventEmitter.addListener('pinged', (event) => {
       setScanned(prevScanned => prevScanned + 1);
       if (event.exitValue === 0) {
-        setDevices(prevDevices => [...prevDevices, event.host]);
+        setDevices(prevDevices => ({...prevDevices, [event.ip]: event.name}));
+        // const client = new Client();
+
+        // client.on('response', (headers, statusCode, rinfo) => {
+        //   if (rinfo.address === event.ip) {
+        //     console.log(`Got a response from the targeted IP (${targetIPAddress}):`, headers);
+        //     let device = devices[event.ip];
+        //     setDevices({...devices, [event.ip]: "hey there"});
+        //   }
+        // });
+
+        // Search for all devices
+        // client.search('ssdp:all');
       }
     });
 
@@ -184,7 +197,7 @@ export default Dashboard = () => {
             placeholder="mask"
             placeholderTextColor="#606060"
           />
-          <TouchableOpacity style={{ ...styles.btn, ...{ aspectRatio: 1 } }} onPress={scanAllIPs}>
+          <TouchableOpacity style={{ ...styles.btn, aspectRatio: 1 }} onPress={scanAllIPs}>
             <Icon name="caret-forward-outline" size={20} color="black" />
           </TouchableOpacity>
         </View>
@@ -197,15 +210,15 @@ export default Dashboard = () => {
         title="Go to Device"
         onPress={() => navigation.navigate("Device")}
       /> */}
-      <View style={{ ...styles.content, ...{ flex: 1, flexDirection: "column" } }}>
-        <View style={{ ...styles.titleContainer, ...{ marginBottom: 7 } }}>
+      <View style={{ ...styles.content, flex: 1, flexDirection: "column" }}>
+        <View style={{ ...styles.titleContainer,  marginBottom: 7 }}>
           <Text style={styles.h2}>devices{devices.length ? ` (${devices.length})` : ''}</Text>
           <Text style={styles.h3}>{scanned} / {calculateNumberOfHosts(mask)}</Text>
         </View>
         <ScrollView contentContainerStyle={{ rowGap: 5 }}>
-          {devices.length ? devices.map((ip, i) => {
+          {Object.keys(devices).length ? Object.entries(devices).map(([ip, name]) => {
             return (
-              <DeviceRow ip={ip} key={i} />
+              <DeviceRow ip={ip} key={ip} name={name}/>
             );
           }) : <View style={{height: 100, width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "center"}}><Text>scan the network</Text></View>}
         </ScrollView>

@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.BaseJavaModule;
+import java.net.UnknownHostException;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -48,8 +49,15 @@ public class ParallelPingModule extends ReactContextBaseJavaModule {
                     Process process = Runtime.getRuntime().exec(String.format("ping -c %d %s", count, host));
                     int exitValue = process.waitFor();
                     WritableMap params = Arguments.createMap();
-                    params.putString("host", host);
+                    params.putString("ip", host);
                     params.putInt("exitValue", exitValue);
+                    try {
+                        InetAddress inetAddress = InetAddress.getByName(host);
+                        String hostName = inetAddress.getHostName();
+                        params.putString("name", hostName);
+                    } catch (UnknownHostException e) {
+                        params.putString("name", "Unknown");
+                    }
                     sendEvent(getReactApplicationContext(), "pinged", params);
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
