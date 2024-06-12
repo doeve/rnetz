@@ -1,19 +1,46 @@
 import React from "react";
-import { View, Button } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import styles from "../assets/styles/styles";
+import Ping from 'react-native-ping';
+import Text from "./CText";
+import { useState, useEffect } from "react";
+import Icon from "react-native-vector-icons/Ionicons"
+
 
 const Device = (props) => {
   const navigation = useNavigation();
-  console.log(props);
+  let { name, ip } = props.route.params;
+  const [rtt, setRtt] = useState(0);
+
+  const getRtt = async () => {
+    try {
+      const ms = await Ping.start(ip,{ timeout: 1000 });
+      setRtt(ms);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    getRtt();
+  }, []);
 
   return (
-    <View>
-      <Button
-        title="Go to Details"
-        onPress={() => navigation.navigate("Details")}
-      />
-    </View>
+    <View style={{ flexDirection: "column", gap: 10, height: "100%" }}>
+      <View style={{ ...styles.content, flex: 1, flexDirection: "column" }}>
+        <View style={{ ...styles.titleContainer,  marginBottom: 7 }}>
+          <Text style={ip === name? styles.h1 : styles.h2}>{name}</Text>
+          <TouchableOpacity onPress={() => getRtt()} style={{ flexDirection: "row", gap: 5}}>
+            <Icon name="refresh" size={20} color="black" />
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text style={{ fontSize: 12, color: "#888888" }}>RTT: {rtt > 0 ? `${rtt}ms` : "-"}</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+        {ip !== name && <Text style={styles.h3}>{ip}</Text>}
+        </View>
+      </View>
   );
 };
 

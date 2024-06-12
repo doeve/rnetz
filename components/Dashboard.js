@@ -34,6 +34,12 @@ export default Dashboard = () => {
   const { ParallelPing } = NativeModules;
   const eventEmitter = new NativeEventEmitter(ParallelPing);
 
+  const [ownIp, setOwnIp] = useState("");
+
+  NetworkInfo.getIPV4Address().then(ipv4Address => 
+    setOwnIp(ipv4Address)
+  );
+
   const subnetToCIDR = (subnet) => {
     const octets = subnet.split('.').map(Number);
     const binaryString = octets.map(octet => octet.toString(2).padStart(8, '0')).join('');
@@ -127,6 +133,7 @@ export default Dashboard = () => {
   }, [isLocal]);
 
   const handleSwitchToggle = () => {
+    setDevices([]);
     setIsLocal(!isLocal);
     console.log(isLocal);
     const message = isLocal ? "outer network" : "local network";
@@ -141,7 +148,11 @@ export default Dashboard = () => {
 
   const calculateNumberOfHosts = (mask) => {
     const subnet = parseInt(mask.slice(1), 10);
-    return Math.pow(2, 32 - subnet) - 2;
+    if (mask.match(/\/\d+/) && subnet >= 0 && subnet < 32) {
+      return Math.pow(2, 32 - subnet) - 2;
+    } else {
+      return 0;
+    }
   }
 
   const ShowIp = async () => {
@@ -210,7 +221,7 @@ export default Dashboard = () => {
         <ScrollView contentContainerStyle={{ rowGap: 5, flexGrow: 1 }}>
           {Object.keys(devices).length ? Object.entries(devices).map(([deviceIp, deviceName]) => {
             return (
-              <DeviceRow ip={deviceIp} key={deviceIp} name={deviceName + (deviceIp === ip? " (You)" : "")}/>
+              <DeviceRow ip={deviceIp} key={deviceIp} name={deviceName + (deviceIp == ownIp? " (You)" : "")}/>
             );
           }) : <View style={{height: 100, width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "center"}}><Text>scan the network</Text></View>}
         </ScrollView>
