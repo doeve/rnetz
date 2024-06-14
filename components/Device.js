@@ -1,17 +1,19 @@
-import React from "react";
+
+import Icon from "react-native-vector-icons/Ionicons"
+import React, { useState } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import styles from "../assets/styles/styles";
 import Ping from 'react-native-ping';
 import Text from "./CText";
-import { useState, useEffect } from "react";
-import Icon from "react-native-vector-icons/Ionicons"
+import { useEffect } from "react";
 
 
 const Device = (props) => {
   const navigation = useNavigation();
   let { name, ip } = props.route.params;
   const [rtt, setRtt] = useState(0);
+  const [selectedOption, setSelectedOption] = useState(null);
 
   const getRtt = async () => {
     try {
@@ -26,6 +28,31 @@ const Device = (props) => {
     getRtt();
   }, []);
 
+  const handleOptionPress = (option) => {
+    setSelectedOption(option);
+  }
+
+  const renderOptionContent = () => {
+    if (selectedOption === "interfaces") {
+      // Code to display the result of "show ip interface brief" command
+      return (
+        <Text>Result of show ip interface brief command</Text>
+      );
+    } else if (selectedOption === "map") {
+      // Code to display the address resolution tree/routing table
+      return (
+        <Text>Address resolution tree/routing table</Text>
+      );
+    } else if (selectedOption === "config") {
+      // Code to display the whole start config
+      return (
+        <Text>Whole start config</Text>
+      );
+    } else {
+      return null;
+    }
+  }
+
   return (
     <View style={{ flexDirection: "column", gap: 10, height: "100%" }}>
       <View style={{ ...styles.content, flex: 1, flexDirection: "column" }}>
@@ -38,18 +65,28 @@ const Device = (props) => {
             </View>
           </TouchableOpacity>
         </View>
-        {ip !== name && <Text style={styles.h3}>{ip}</Text>}
-      </View>
-      <View style={{ flexDirection: "row" }}>
-        <TouchableOpacity  style={{...styles.lgBtn, borderBottomRightRadius: 0, borderTopRightRadius: 0}}>
-          <Text>interfaces</Text>
-        </TouchableOpacity>
-        <TouchableOpacity  style={{...styles.lgBtn, borderRadius: 0}}>
-          <Text>map</Text>
-        </TouchableOpacity>
-        <TouchableOpacity  style={{...styles.lgBtn, borderBottomLeftRadius: 0, borderTopLeftRadius: 0}}>
-          <Text>config</Text>
-        </TouchableOpacity>
+        {ip !== name && <Text style={{...styles.h3, marginBottom: 6}}>{ip}</Text>}
+        <View style={{ flexDirection: "row"}}>
+          <TouchableOpacity onPress={() => handleOptionPress("interfaces")} style={{...styles.lgBtn, borderBottomRightRadius: 0, borderTopRightRadius: 0, flex: 1, justifyContent: "center"}}>
+            <Text>interfaces</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleOptionPress("map")} style={{...styles.lgBtn, borderRadius: 0, flex: 1, justifyContent: "center"}}>
+            <Text>map</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleOptionPress("config")} style={{...styles.lgBtn, borderBottomLeftRadius: 0, borderTopLeftRadius: 0, flex: 1, justifyContent: "center"}}>
+            <Text>config</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{ flex: 1 }}>
+          <View style={{ flex: 0.6 }}>
+            <View>
+              {renderOptionContent()}
+            </View>
+          </View>
+          <View style={{ flex: 0.4 }}>
+            <Text style={styles.h3}>Console</Text>
+          </View>
+        </View>
       </View>
     </View>
   );
