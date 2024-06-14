@@ -17,10 +17,10 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
-public class ParallelPingModule extends ReactContextBaseJavaModule {
+public class ParallelPing extends ReactContextBaseJavaModule {
     private static ReactApplicationContext reactContext;
 
-    ParallelPingModule(ReactApplicationContext context) {
+    ParallelPing(ReactApplicationContext context) {
         super(context);
         reactContext = context;
     }
