@@ -33,6 +33,16 @@ public class SSHConnector extends ReactContextBaseJavaModule {
                     // Avoid asking for key confirmation
                     java.util.Properties config = new java.util.Properties();
                     config.put("StrictHostKeyChecking", "no");
+                    config.put("kex", "diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1,diffie-hellman-group1-sha1");
+                    config.put("server_host_key", "ssh-rsa");
+                    // Add server-supported cipher algorithms for client to server direction
+                    // config.put("cipher.c2s", "aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr");
+                    // Also add for server to client direction for consistency
+
+                    // Set the cipher algorithms for server-to-client direction
+                    config.put("cipher.s2c", "aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc");
+                    // Set the cipher algorithms for client-to-server direction to match the server's supported algorithms
+                    config.put("cipher.c2s", "aes128-cbc,3des-cbc,aes192-cbc,aes256-cbc");
                     session.setConfig(config);
 
                     session.connect();

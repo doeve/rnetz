@@ -1,19 +1,22 @@
 
 import Icon from "react-native-vector-icons/Ionicons"
 import React, { useState } from "react";
-import { View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, NativeModules } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import styles from "../assets/styles/styles";
 import Ping from 'react-native-ping';
 import Text from "./CText";
 import { useEffect } from "react";
 
+const { SSHConnector } = NativeModules;
 
 const Device = (props) => {
   const navigation = useNavigation();
   let { name, ip } = props.route.params;
   const [rtt, setRtt] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [commandOutput, setCommandOutput] = useState('');
+
 
   const getRtt = async () => {
     try {
@@ -28,30 +31,36 @@ const Device = (props) => {
     getRtt();
   }, []);
 
-  const handleOptionPress = (option) => {
+  const handleOptionPress = async (option) => {
     setSelectedOption(option);
-  }
+    let command = '';
+    switch (option) {
+      case 'interfaces':
+        command = 'show ip interface brief';
+        break;
+      case 'map':
+        command = 'show ip route'; // Example command, adjust based on actual needs
+        break;
+      case 'config':
+        command = 'show running-config';
+        break;
+      default:
+        setCommandOutput('');
+        return;
+    }
+
+    try {
+      const output = await SSHConnector.executeCommand(ip, 22, 'username', 'password', command);
+      setCommandOutput(output);
+    } catch (error) {
+      console.error('SSH Command Error:', error);
+      setCommandOutput('Error executing command');
+    }
+  };
 
   const renderOptionContent = () => {
-    if (selectedOption === "interfaces") {
-      // Code to display the result of "show ip interface brief" command
-      return (
-        <Text>Result of show ip interface brief command</Text>
-      );
-    } else if (selectedOption === "map") {
-      // Code to display the address resolution tree/routing table
-      return (
-        <Text>Address resolution tree/routing table</Text>
-      );
-    } else if (selectedOption === "config") {
-      // Code to display the whole start config
-      return (
-        <Text>Whole start config</Text>
-      );
-    } else {
-      return null;
-    }
-  }
+    return commandOutput ? <Text>{commandOutput}</Text> : null;
+  };
 
   return (
     <View style={{ flexDirection: "column", gap: 10, height: "100%" }}>
