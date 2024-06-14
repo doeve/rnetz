@@ -34,13 +34,24 @@ const Device = (props) => {
           <TouchableOpacity onPress={() => getRtt()} style={{ flexDirection: "row", gap: 5}}>
             <Icon name="refresh" size={20} color="black" />
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Text style={{ fontSize: 12, color: "#888888" }}>RTT: {rtt > 0 ? `${rtt}ms` : "-"}</Text>
+              <Text style={{ ...styles, color: "#888888" }}>RTT: {rtt > 0 ? `${rtt}ms` : "-"}</Text>
             </View>
           </TouchableOpacity>
         </View>
         {ip !== name && <Text style={styles.h3}>{ip}</Text>}
-        </View>
       </View>
+      <View style={{ flexDirection: "row" }}>
+        <TouchableOpacity  style={{...styles.lgBtn, borderBottomRightRadius: 0, borderTopRightRadius: 0}}>
+          <Text>interfaces</Text>
+        </TouchableOpacity>
+        <TouchableOpacity  style={{...styles.lgBtn, borderRadius: 0}}>
+          <Text>map</Text>
+        </TouchableOpacity>
+        <TouchableOpacity  style={{...styles.lgBtn, borderBottomLeftRadius: 0, borderTopLeftRadius: 0}}>
+          <Text>config</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 

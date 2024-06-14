@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ParallelPingPackage implements ReactPackage {
+public class SSHConnectorPackage implements ReactPackage {
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         return Collections.emptyList();
@@ -18,7 +18,7 @@ public class ParallelPingPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(new ParallelPingModule(reactContext));
+        modules.add(new SSHConnectorModule(reactContext));
         return modules;
     }
 }
