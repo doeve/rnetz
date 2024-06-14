@@ -39,10 +39,10 @@ const Device = (props) => {
         command = 'show ip interface brief';
         break;
       case 'map':
-        command = 'show ip route'; // Example command, adjust based on actual needs
+        command = 'show ip route';
         break;
       case 'config':
-        command = 'show running-config';
+        command = 'show startup-config';
         break;
       default:
         setCommandOutput('');
