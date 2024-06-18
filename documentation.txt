@@ -1,0 +1,139 @@
+
+
+
+
+
+Netz – mobile network scanning, management, and configuration appliance
+Candidate: Șerb David-Mihai
+Scientific coordonator: Dr. Ing. Stolojescu-Crișan Cristina-Laura
+Savnet coordonator: Dr. Ing. Adrian Savu-Jivanov
+
+
+Sesiunea: Iunie 2024
+Abbreviations
+
+PC – Personal Computer
+ARP – Address Resolution Protocol
+CCNA – Cisco Certified Network Associate
+UI – User Interface
+ICMP – Internet Control Message Protocol
+SSH – Secure Shell
+SFTP – Secure File Transfer Protocol
+RTT – Round-trip Time
+IP – Internet Protocol
+ 
+
+Content table
+
+1.	Introduction	6
+1.1	Problem statement	6
+1.2	Objectives	6
+2	System design and architecture	7
+2.1	System overview	7
+2.2	Component design	7
+2.2.1	Dashboard	7
+2.2.2	Device	7
+2.2.3	DeviceRow	8
+2.2.4	Header	8
+2.2.5	Container	8
+2.3	Data flow	8
+
+
+ 
+		Rezumat
+
+În era conectivității, unde chiar și cele mai nesofisticate dispozitive au acces la internet, redundanța și funcționarea corectă a oricărei rețea este crucială pentru a suporta infrastructura din secolul acesta. Documentația prezetă va detalia în amploare funcționalitățiile aplicației “Netz”, un instrument care combină printre altele, multe funcții de automatizare, scanare, și de interogarea dispozitivelor de rețea într-un pachet intuitiv, structurat și ușor de înțeles de experți în domeniu, cât și de începători.
+Scopul primar al aplicației este asistarea amplă la depanarea problemelor de rețea, iar prin aceste instrmente oferă inclusiv un suport academic celor care tocmai își încep călătoria în domeniul rețelisticii. 
+Pentru a depana un dispozitiv de rețea (router/switch), sunt necesare cunoștințe de bază extinse, cât și un dispozitiv capabil de asta (de obicei un PC). Netz încearcă să rezolve această problemă; cu o interfață intuitivă, utilizatorul poate accesa următoarele funționalități principale numai prin câteva butoane:
+-	Scanare de rețea locală sau externă
+-	Informații despre denumirea și versiunea hardware și software
+-	Informații despre interfețele dispozitivului
+-	Tabel ARP sau de rutare
+-	Exportare/Importare de configurație
+-	Orice altă configurație posibilă
+ 
+Abstract
+
+In the era of connectivity, where even the most unsophisticated devices have internet access, the redundancy and proper functioning of any network are crucial to support the infrastructure of this century. The present documentation will extensively detail the functionalities of the Netz application, a tool that combines, among other things, many automation, scanning, and network device querying functions into an intuitive, structured, and easy-to-understand package for both domain experts and beginners.
+The primary purpose of the application is to broadly assist in troubleshooting network issues, but through these tools, it also provides academic support to those just beginning their journey in networking.
+In order to troubleshoot a network device (router/switch), an extensive base knowledge is required, as well as a capable device (usually a PC). However, Netz aims to solve this issue; with an intuitive interface, the user can access the following main functionalities with only a few taps:
+-	Scanning local or external networks
+-	Information about the hardware and software name and version
+-	Information about the device interfaces
+-	ARP or routing table
+-	Start configuration export/import
+-	Virtually any possible configuration
+
+ 
+1.	Introduction
+
+The main purpose of Netz is to bring network debugging to an accessible form as a proof of concept but also as a functional tool. When debugging a network device, the majority of protocols that are used are already in-built in the mobile device, or can be recreated using native code.
+Using protocols from the first 2 modules of CCNA, and a UI software framework, all of the tools are made available to create an application which communicates with the network and its devices. The main protocols that are used in the app are the following: ICMP, SSH, SFTP.
+
+1.1	Problem statement
+
+Troubleshooting network devices (such as routers or switches) requires many factors, as described, which can be a barrier for many users. Given that the most used mobile operating systems, Android and iOS are both derived from Unix (or Unix-like systems), it is no surprise that they can perform virtually every functionality needed to debug a network device; yet there has not been an accessible way to do so.
+Traditionally, debugging a network/network device was done using repetitive tasks, and tedious, and not explicit processes, that always had rudimentary, text-based output. Netz basically processes these outputs, so they are more human-friendly, and contain more structured information. This lowers the entry barrier, so unexperienced users can read the necessary information they are searching for, without getting sidetracked.
+
+1.2	Objectives
+
+The primary objective was to reduce the barriers to entry in this field compared to previous standards. Given that our handheld devices have become a crucial part of our daily lives, the logical next-step is to integrate more and more intricate and complex tasks bundled in user-friendly and simple but technical applications. This promotes accessibility, sparks curiosity and the desire to learn more about a given topic, if it is packaged to the user’s liking.
+Besides accessibility, the main goal was functionality and ease-of-use. In order to create a user-friendly but also functional application, it is imperative to use well-structured data, and display it in a logical and intuitive form so the user intuitively understands each function. 
+Beginners and experts as well can easily navigate through the application since it offers functions suitable for every kind of user. If needed, it can be used simply for device diagnosis, using basic functionalities like interface querying, or it can totally reconfigure a network device in any shape or form (the functionalities will be thoroughly discussed in the following chapters).
+
+
+ 
+2	System design and architecture
+
+The application was developed using modern architecture and industry-standard tools and libraries. It incorporates a suite of instruments that are widely used in this industry and paints them with a friendly and intuitive user-interface.
+Modern software development trends tend to lean towards a component-based architecture, which is understandable considering all of its benefits. This architecture provides a reusable, isolated and easily troubleshootable component system, where the developer can easily pinpoint the root-cause of a given issue. This approach gives the developer the advantages of modularity, and usually the comfort of event based systems.
+Scalability, modularity and a modern feel was a priority, thus I chose to use the React Native JavaScript framework in order to achieve my goals. React Native is a framework released by Meta in 2015 after the release of React, by the same team. It leverages a component based system, which compiles into native code (Java for Android, Swift for iOS), enabling the app to use the same native API.
+
+2.1	System overview
+
+Functionality-wise, not many different methods are used. Main functions are the parallel threaded ping for rapid scanning, and SSH that manipulates the device we are connecting to. All of the functionalities can be classified into 2 categories:
+-	React Native libraries: individual ping, RTT, & diagnosis
+-	Native code: parallel threaded ping & SSH
+The application is totally independent, meaning that it will not need any outer service or server to run, all of the computing is done in the device itself. The app provides security measures, to reassure the safety of the transmitted data, through secured protocols such as SFTP and SSH.
+
+2.2	Component design
+
+The main feature of developing with React Native is the modularity it creates. In order to create a modular design, one needs components. Netz is built mainly using the following components: Dashboard, Device, DeviceRow, Container. They foster all of the application’s functionalities as I will describe in the following sub-chapters.
+2.2.1	Dashboard
+In the Dashboard component, we can see 2 input fields, one for thew network IP, and another one for the mask. Next to them we can see a button which will scan the given network hosts in function of the mask. This is where the parallel ping is implemented, so the scans are not sequential, but threaded and parallel, thus offering a much better timely performance. 
+2.2.2	Device
+In the Device component we can see the diagnosis information, as well as the 3 buttons, labeled „interface”, „network map” and „config”, their display pane, and also a console. 
+2.2.3	DeviceRow
+The DeviceRow component only creates an element which is spawned when a device has been found by the parallel scan. It contains the IP address, and the device’s name, if it has been given. This is basically a button with 2 labels.
+2.2.4	Header
+The header does not necessarily have any valuable functionality besides the „back” button when we are in the Device container, to be able to go back to the Dashboard. On the header we can find our logo, but also the app’s name, netz.
+2.2.5	Container
+The Container is just a wrapper for every other component besides the Header. It uses its modularity to avoid code repetition and to implement a default padding to every component that will be displayed. This way we can sustain a unified feeling for every menu and screen from within the app. This modularity is where React Native truly shines. 
+
+2.3	Data flow
+
+The main data flow of the application is represented in figure 6. Rectangles represent components, while circles/ellipsoids are actions taken by the application.
+
+
+
+
+
+
+
+
+
+
+
+Figure 6 – Data flow of the application
+
+This is the usually access path of a user: enters network IP and mask, the app calculates all of the possible hosts, and tries to ping them parallelly. If a ping is successful, it also tries to get its name. On success, the data will be sent to the DeviceRow component. As an IP is like an identifier for a given device, that is the only main parameter we pass on to the other components.
+3	Implementation
+
+As previously mentioned, a few of the main goals of this thesis were to build a scalable, modern and cutting-edge instrument; in shorter form, that would be described by the term „state of the art”.
+Systems nowadays are inclined to be event-based given their flexibility and reactivity. One such framework is React Native, used for its cross-platform features, native components, and developer-friendly environment, which has been a great choice for a project such as this one. As many events are triggered by external factors, the framework’s reactive system was able to handle many intricate tasks with ease.
+Another great feature of React Native is its active community which provides a vast plane of libraries for the majority of use cases. The community but also the Meta created libraries help create a native feel for each of the platforms, but also eases the development process. Even if there is a broad registry of libraries, they cannot possibly cover every use case; this is where native programming comes in handy. As it will be described in the following chapters, a few components used native code.
+
+3.1	Technology stack
+
+As discussed earlier, React Native uses an event-based system. While this is one of its most prominent features, how does it actually work?
+
