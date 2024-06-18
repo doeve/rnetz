@@ -1,5 +1,55 @@
-
-
+basic struct:
+1. Introduction
+    Project Background and Motivation
+    Problem Statement
+    Objectives
+    Scope
+2. System Design and Architecture
+    System Overview
+    Component Design
+    Data Flow Diagrams
+3. Implementation
+    Technology Stack
+    Development Process
+    Challenges and Solutions
+4. Testing
+    Testing Strategy
+    Test Cases and Results
+5. Evaluation
+    Performance Evaluation
+    User Feedback
+6. User Interface
+    Overview
+    Navigating the App
+7. Features
+    Scanning for Devices
+    Device Diagnosis and Information
+    Accessing Device Information
+    Firmware Information
+    Interface Checks
+    ARP/Routing Table
+    Start Config
+    Advanced Features
+    Custom Scans
+    Saving and Exporting Data
+8. Settings and Configuration
+    General Settings
+    Network Settings
+    Notifications
+9. Troubleshooting
+    Common Issues
+    Network Troubleshooting
+    App Crashes and Errors
+10. FAQs
+12. Conclusion and Future Work
+    Summary of Findings
+    Contributions
+    Future Work
+13. References
+14. Glossary
+17. Feedback
+    Improving Documentation
+    Feature Requests
 
 
 
@@ -23,20 +73,7 @@ RTT – Round-trip Time
 IP – Internet Protocol
  
 
-Content table
-
-1.	Introduction	6
-1.1	Problem statement	6
-1.2	Objectives	6
-2	System design and architecture	7
-2.1	System overview	7
-2.2	Component design	7
-2.2.1	Dashboard	7
-2.2.2	Device	7
-2.2.3	DeviceRow	8
-2.2.4	Header	8
-2.2.5	Container	8
-2.3	Data flow	8
+Content table [...]
 
 
  
