@@ -1,7 +1,7 @@
 
 import Icon from "react-native-vector-icons/Ionicons"
 import React, { useState } from "react";
-import { View, TouchableOpacity, NativeModules } from "react-native";
+import { View, TouchableOpacity, NativeModules, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import styles from "../assets/styles/styles";
 import Ping from 'react-native-ping';
@@ -19,6 +19,7 @@ const Device = (props) => {
   const [firmwareModel, setFirmwareModel] = useState('');
   const [firmwareVersion, setFirmwareVersion] = useState('');
   const [uptime, setUptime] = useState('');
+  const [console, setConsole] = useState('');
 
 
   const getRtt = async () => {
@@ -38,7 +39,7 @@ const Device = (props) => {
         const firmwareMatch = commandOutput.match(/Cisco IOS Software, ([\S\s]*?), Version ([\S\s]*?),/);
         const modelMatch = firmwareMatch && firmwareMatch[1].trim();
         const versionMatch = firmwareMatch && firmwareMatch[2].trim();
-        const uptimeMatch = commandOutput.match(/uptime is ([\S\s]*?)\s/);
+        const uptimeMatch = commandOutput.match(/uptime is ([\S\s]*?)\n/);
         const uptimeValue = uptimeMatch && uptimeMatch[1].trim();
         setFirmwareModel(modelMatch);
         setFirmwareVersion(versionMatch);
@@ -58,9 +59,43 @@ const Device = (props) => {
     switch (option) {
       case 'interfaces':
         command = 'show ip interface brief';
+        try {
+          const output = await SSHConnector.executeCommand(ip, 22, 'username', 'password', command);
+          setConsole(prev => prev + `\n${output}`);
+          const interfaces = output.split('\n').slice(2).map(line => line.trim().split(/\s+/));
+          const interfaceContent = interfaces.map(([name, ip, ok, protocol, status]) => (
+        <View key={name} style={styles.detailRow}>
+          <Text style={{flex: 0.5}}>{name}</Text>
+          <Text style={{flex: 0.4}}>{ip}</Text>
+          {status === 'up' ? <Icon name="arrow-up-outline" size={20} color="green" /> : <Icon name="arrow-down-outline" size={20} color="red" />}
+        </View>
+          ));
+          setCommandOutput(interfaceContent);
+        } catch (error) {
+          console.error('SSH Command Error:', error);
+          setCommandOutput(<Text>Error executing command</Text>);
+        }
         break;
       case 'map':
         command = 'show ip route';
+        try {
+          const output = await SSHConnector.executeCommand(ip, 22, 'username', 'password', command);
+          setConsole(prev => prev + `\n${output}`);
+          const routes = output.split('\n').slice(2).map(line => line.trim().split(/\s+/));
+          const routeContent = routes.map(([network, mask, nextHop, metric, interf], i) => (
+          <View key={i} style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <Text>{network}</Text>
+            <Text>{mask}</Text>
+            <Text>{nextHop}</Text>
+            <Text>{metric}</Text>
+            <Text>{interf}</Text>
+          </View>
+        ));
+        setCommandOutput(routeContent);
+      } catch (error) {
+        console.error('SSH Command Error:', error);
+        setCommandOutput(<Text>Error executing command</Text>);
+      }
         break;
       case 'config':
         command = 'show startup-config';
@@ -70,17 +105,17 @@ const Device = (props) => {
         return;
     }
 
-    try {
-      const output = await SSHConnector.executeCommand(ip, 22, 'username', 'password', command);
-      setCommandOutput(output);
-    } catch (error) {
-      console.error('SSH Command Error:', error);
-      setCommandOutput('Error executing command');
-    }
+    // try {
+    //   const output = await SSHConnector.executeCommand(ip, 22, 'username', 'password', command);
+    //   setCommandOutput(output);
+    // } catch (error) {
+    //   console.error('SSH Command Error:', error);
+    //   setCommandOutput('Error executing command');
+    // }
   };
 
   const renderOptionContent = () => {
-    return <Text>{commandOutput}</Text>;
+    return {commandOutput};
   };
 
   return (
@@ -99,7 +134,7 @@ const Device = (props) => {
         <View style={{marginBottom: 5}}>
           <View style={{flexDirection: "row"}}><Text style={{fontWeight: "bold"}}>model:</Text><Text> {firmwareModel}</Text></View>
           <View style={{flexDirection: "row"}}><Text style={{fontWeight: "bold"}}>version:</Text><Text> {firmwareVersion}</Text></View>
-          <View style={{flexDirection: "row"}}><Text style={{fontWeight: "bold"}}>uptime:</Text><Text> {uptime} mins</Text></View>
+          <View style={{flexDirection: "row"}}><Text style={{fontWeight: "bold"}}>uptime:</Text><Text> {uptime}</Text></View>
         </View>
         <View style={{ flexDirection: "row"}}>
           <TouchableOpacity onPress={() => handleOptionPress("interfaces")} style={{...styles.lgBtn, borderBottomRightRadius: 0, borderTopRightRadius: 0, flex: 1, justifyContent: "center"}}>
@@ -113,13 +148,16 @@ const Device = (props) => {
           </TouchableOpacity>
         </View>
         <View style={{ flex: 1 }}>
-          <View style={{ flex: 0.6, backgroundColor: "grey" }}>
-            <View>
-              {renderOptionContent()}
-            </View>
+          <View style={{ flex: 0.6, padding: 10, marginVertical: 10, backgroundColor: "#fafafa", borderWidth: 1, borderRadius: 4, elevation: 3, borderColor: "#a0a0a0", flexDirection: "column", gap: 5 }}>
+            {commandOutput}
           </View>
-          <View style={{ flex: 0.4 }}>
-            <Text style={styles.h3}>Console</Text>
+          <View style={{ flex: 0.4, padding: 10, borderRadius: 5, backgroundColor: "#1f1f1f", fontWeight: "bold", color: "#ffffff"}}>
+            <Text style={{ color: "#f1f1f1", marginTop: -5, fontWeight: "bold" }}>console</Text>
+            <ScrollView contentContainerStyle={{ rowGap: 5 }}>
+              <Text style={{color: "white"}}>
+                {console}
+              </Text>
+            </ScrollView>
           </View>
         </View>
       </View>

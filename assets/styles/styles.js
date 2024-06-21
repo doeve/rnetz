@@ -130,6 +130,18 @@ const styles = StyleSheet.create({
   },
   ipInput: {
     flexGrow: 1
+  },
+  whiteText: {
+    color: "white"
+  },
+  detailRow: {
+    flexDirection: "row",
+    padding: 3,
+    backgroundColor: "#f4f4f4",
+    borderWidth: 1,
+    borderRadius: 4,
+    elevation: 3,
+    borderColor: "#a0a0a0"
   }
 });
 
