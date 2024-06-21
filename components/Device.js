@@ -16,6 +16,9 @@ const Device = (props) => {
   const [rtt, setRtt] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [commandOutput, setCommandOutput] = useState('');
+  const [firmwareModel, setFirmwareModel] = useState('');
+  const [firmwareVersion, setFirmwareVersion] = useState('');
+  const [uptime, setUptime] = useState('');
 
 
   const getRtt = async () => {
@@ -29,6 +32,24 @@ const Device = (props) => {
 
   useEffect(() => {
     getRtt();
+    (async () => {
+      try {
+        const commandOutput = await SSHConnector.executeCommand(ip, 22, 'username', 'password', 'show version');
+        const firmwareMatch = commandOutput.match(/Cisco IOS Software, ([\S\s]*?), Version ([\S\s]*?),/);
+        const modelMatch = firmwareMatch && firmwareMatch[1].trim();
+        const versionMatch = firmwareMatch && firmwareMatch[2].trim();
+        const uptimeMatch = commandOutput.match(/uptime is ([\S\s]*?)\s/);
+        const uptimeValue = uptimeMatch && uptimeMatch[1].trim();
+        setFirmwareModel(modelMatch);
+        setFirmwareVersion(versionMatch);
+        setUptime(uptimeValue);
+      } catch (error) {
+        console.error('SSH Command Error:', error);
+        setFirmwareModel('Error');
+        setFirmwareVersion('Error');
+        setUptime('Error');
+      }
+    })();
   }, []);
 
   const handleOptionPress = async (option) => {
@@ -59,7 +80,7 @@ const Device = (props) => {
   };
 
   const renderOptionContent = () => {
-    return commandOutput ? <Text>{commandOutput}</Text> : null;
+    return <Text>{commandOutput}</Text>;
   };
 
   return (
@@ -75,6 +96,11 @@ const Device = (props) => {
           </TouchableOpacity>
         </View>
         {ip !== name && <Text style={{...styles.h3, marginBottom: 6}}>{ip}</Text>}
+        <View style={{marginBottom: 5}}>
+          <View style={{flexDirection: "row"}}><Text style={{fontWeight: "bold"}}>model:</Text><Text> {firmwareModel}</Text></View>
+          <View style={{flexDirection: "row"}}><Text style={{fontWeight: "bold"}}>version:</Text><Text> {firmwareVersion}</Text></View>
+          <View style={{flexDirection: "row"}}><Text style={{fontWeight: "bold"}}>uptime:</Text><Text> {uptime} mins</Text></View>
+        </View>
         <View style={{ flexDirection: "row"}}>
           <TouchableOpacity onPress={() => handleOptionPress("interfaces")} style={{...styles.lgBtn, borderBottomRightRadius: 0, borderTopRightRadius: 0, flex: 1, justifyContent: "center"}}>
             <Text>interfaces</Text>
@@ -87,7 +113,7 @@ const Device = (props) => {
           </TouchableOpacity>
         </View>
         <View style={{ flex: 1 }}>
-          <View style={{ flex: 0.6 }}>
+          <View style={{ flex: 0.6, backgroundColor: "grey" }}>
             <View>
               {renderOptionContent()}
             </View>
