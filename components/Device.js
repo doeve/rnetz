@@ -81,14 +81,12 @@ const Device = (props) => {
         try {
           const output = await SSHConnector.executeCommand(ip, 22, 'username', 'password', command);
           setConsole(prev => prev + `\n${output}`);
-          const routes = output.split('\n').slice(2).map(line => line.trim().split(/\s+/));
-          const routeContent = routes.map(([network, mask, nextHop, metric, interf], i) => (
-          <View key={i} style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            <Text>{network}</Text>
-            <Text>{mask}</Text>
-            <Text>{nextHop}</Text>
-            <Text>{metric}</Text>
-            <Text>{interf}</Text>
+          const routes = output.split('\n').slice(13).map(line => line.trim().split(/\s+/));
+          const routeContent = routes.map((route, i) => (
+          <View key={i} style={styles.detailRow}>
+<           Text style={{flex: 0.1}}>{route[0]}</Text>
+<           Text style={{flex: 0.5}}>{route[1]}</Text>
+<           Text style={{flex: 0.4}}>{route[route.length - 1]}</Text>
           </View>
         ));
         setCommandOutput(routeContent);
@@ -153,8 +151,9 @@ const Device = (props) => {
           </View>
           <View style={{ flex: 0.4, padding: 10, borderRadius: 5, backgroundColor: "#1f1f1f", fontWeight: "bold", color: "#ffffff"}}>
             <Text style={{ color: "#f1f1f1", marginTop: -5, fontWeight: "bold" }}>console</Text>
-            <ScrollView contentContainerStyle={{ rowGap: 5 }}>
-              <Text style={{color: "white"}}>
+            <ScrollView ref={ref => {this.scrollView = ref}}
+    onContentSizeChange={() => this.scrollView.scrollToEnd({animated: true})}>
+              <Text style={{color: "white", fontSize: 10}}>
                 {console}
               </Text>
             </ScrollView>
