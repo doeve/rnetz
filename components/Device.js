@@ -135,13 +135,13 @@ const Device = (props) => {
           <View style={{flexDirection: "row"}}><Text style={{fontWeight: "bold"}}>uptime:</Text><Text> {uptime}</Text></View>
         </View>
         <View style={{ flexDirection: "row"}}>
-          <TouchableOpacity onPress={() => handleOptionPress("interfaces")} style={{...styles.lgBtn, borderBottomRightRadius: 0, borderTopRightRadius: 0, flex: 1, justifyContent: "center"}}>
+          <TouchableOpacity onPress={() => handleOptionPress("interfaces")} style={{...styles.lgBtn, borderBottomRightRadius: 0, borderTopRightRadius: 0, flex: 1, justifyContent: "center", backgroundColor: selectedOption === "interfaces" ? "#e4e4e4" : "#f4f4f4"}}>
             <Text>interfaces</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleOptionPress("map")} style={{...styles.lgBtn, borderRadius: 0, flex: 1, justifyContent: "center"}}>
+          <TouchableOpacity onPress={() => handleOptionPress("map")} style={{...styles.lgBtn, borderRadius: 0, flex: 1, justifyContent: "center", backgroundColor: selectedOption === "map" ? "#e4e4e4" : "#f4f4f4"}}>
             <Text>map</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleOptionPress("config")} style={{...styles.lgBtn, borderBottomLeftRadius: 0, borderTopLeftRadius: 0, flex: 1, justifyContent: "center"}}>
+          <TouchableOpacity onPress={() => handleOptionPress("config")} style={{...styles.lgBtn, borderBottomLeftRadius: 0, borderTopLeftRadius: 0, flex: 1, justifyContent: "center", backgroundColor: selectedOption === "config" ? "#e4e4e4" : "#f4f4f4"}}>
             <Text>config</Text>
           </TouchableOpacity>
         </View>
