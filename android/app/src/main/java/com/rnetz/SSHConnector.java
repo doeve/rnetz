@@ -9,6 +9,9 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import android.util.Log;
 
 public class SSHConnector extends ReactContextBaseJavaModule {
     public SSHConnector(ReactApplicationContext reactContext) {
@@ -40,44 +43,70 @@ public class SSHConnector extends ReactContextBaseJavaModule {
 
                     session.connect();
 
-Channel channel = session.openChannel("shell");
+                    Channel channel = session.openChannel("shell");
 
-OutputStream outStream = channel.getOutputStream();
-PrintWriter shellWriter = new PrintWriter(outStream, true);
+                    OutputStream outStream = channel.getOutputStream();
+                    PrintWriter shellWriter = new PrintWriter(outStream, true);
 
-InputStream inStream = channel.getInputStream();
+                    InputStream inStream = channel.getInputStream();
 
-channel.connect();
+                    channel.connect();
 
-// Send the command followed by a newline to execute it
-shellWriter.println(command);
-shellWriter.flush();
+                    // Send the command followed by a newline to execute it
+                    shellWriter.println(command);
+                    shellWriter.flush();
 
-// Optionally, send the password the same way if needed
-// shellWriter.println("yourPassword");
-// shellWriter.flush();
+                    // Optionally, send the password the same way if needed
+                    // shellWriter.println("yourPassword");
+                    // shellWriter.flush();
 
-byte[] tmp = new byte[1024];
-StringBuilder outputBuffer = new StringBuilder();
+                    byte[] tmp = new byte[1024];
+                    byte[] output = new byte[1024];
+                    StringBuilder outputBuffer = new StringBuilder();
+                    
+//                     byte[] tmp = new byte[1024];
+// StringBuilder outputBuffer = new StringBuilder();
+long lastOutputTime = System.currentTimeMillis();
+int lastOutputLength = 0;
+
 while (true) {
-    while (inStream.available() > 0) {
+    if (inStream.available() > 0) {
         int i = inStream.read(tmp, 0, 1024);
         if (i < 0) break;
         outputBuffer.append(new String(tmp, 0, i));
-        System.out.println(new String(tmp, 0, i)); // Print each line as it is received
+        Log.d("SSH", new String(tmp, 0, i));
+        lastOutputTime = System.currentTimeMillis(); // Update last output time
+    } else if (System.currentTimeMillis() - lastOutputTime > 1000) {
+        // If more than 1000 ms have passed without new output
+        if (outputBuffer.length() == lastOutputLength) {
+            // And the output length hasn't changed
+            System.out.println("No new output. Closing channel.");
+            channel.disconnect(); // Close the channel
+            promise.resolve(outputBuffer.toString()); // Resolve the promise
+            break;
+        } else {
+            // Update last output length for the next check
+            lastOutputLength = outputBuffer.length();
+            lastOutputTime = System.currentTimeMillis(); // Reset the timer
+        }
     }
     if (channel.isClosed()) {
-        if (inStream.available() > 0) continue;
+        if (inStream.available() > 0) continue; // Ensure all data is read
         System.out.println("exit-status: " + channel.getExitStatus());
+        promise.resolve(outputBuffer.toString()); // Resolve the promise
         break;
     }
     try {
-        Thread.sleep(1000);
-    } catch (Exception ee) {
+        Thread.sleep(100); // Reduce CPU usage
+    } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        promise.reject(e); // Handle thread interruption
+        break;
     }
 }
                     channel.disconnect();
                     session.disconnect();
+                    Log.d("SSH", outputBuffer.toString());
                     promise.resolve(outputBuffer.toString());
                 } catch (Exception e) {
                     promise.reject("SSH Error", e.getMessage());

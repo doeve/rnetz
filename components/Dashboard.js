@@ -245,8 +245,6 @@ export default Dashboard = () => {
           <View style={{ backgroundColor: "white", borderRadius: 10, padding: 20, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5 }}>
             <View style={{ alignItems: "center" }}>
               <Text style={{ fontWeight: "bold", fontSize: 20, marginBottom: 10, marginTop: -5 }}>SSH Credentials</Text>
-              <Text style={{color: "black"}}>ip: {selectedDevice.deviceIp}</Text>
-              <Text style={{color: "black"}}>name: {selectedDevice.deviceName}</Text>
               <TextInput
                 style={{ ...styles.input, width: "100%", marginBottom: 10 }}
                 placeholder="Username"

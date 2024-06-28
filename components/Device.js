@@ -64,7 +64,7 @@ const Device = (props) => {
         try {
           const output = await SSHConnector.executeCommand(ip, 22, username, password, command);
           setConsoleText(prev => prev + `\n${output}`);
-          const interfaces = output.split('\n').slice(2).map(line => line.trim().split(/\s+/));
+          const interfaces = output.split('\n').slice(3, -1).map(line => line.trim().split(/\s+/));
           const interfaceContent = interfaces.map(([name, ip, ok, protocol, status]) => (
         <View key={name} style={styles.detailRow}>
           <Text style={{flex: 0.5}}>{name}</Text>
@@ -83,7 +83,7 @@ const Device = (props) => {
         try {
           const output = await SSHConnector.executeCommand(ip, 22, username, password, command);
           setConsoleText(prev => prev + `\n${output}`);
-          const routes = output.split('\n').slice(13).map(line => line.trim().split(/\s+/));
+          const routes = output.split('\n').slice(14, -1).map(line => line.trim().split(/\s+/));
           const routeContent = routes.map((route, i) => (
           <View key={i} style={styles.detailRow}>
 <           Text style={{flex: 0.1}}>{route[0]}</Text>
