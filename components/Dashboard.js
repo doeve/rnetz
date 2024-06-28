@@ -11,7 +11,8 @@ import {
   ScrollView,
   NativeModules,
   NativeEventEmitter,
-  LogBox
+  LogBox,
+  Modal
 } from "react-native";
 import Text from "./CText";
 import DeviceRow from "./DeviceRow";
@@ -28,11 +29,17 @@ export default Dashboard = () => {
   const [isLocal, setIsLocal] = useState(true);
   const [ip, setIp] = useState("");
   const [mask, setMask] = useState("");
-  const [devices, setDevices] = useState([]);
+  const [devices, setDevices] = useState({});
   const [scanning, setScanning] = useState(false);
   const [scanned, setScanned] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
   const { ParallelPing } = NativeModules;
   const eventEmitter = new NativeEventEmitter(ParallelPing);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  // const [selectedDevice, setSelectedDevice] = useState({});
+
+  let selectedDevice = {};
 
   const [ownIp, setOwnIp] = useState("");
 
@@ -168,64 +175,105 @@ export default Dashboard = () => {
     });
   }
 
+  const handleModalSubmit = () => {
+    setModalVisible(false);
+    console.log( { ...selectedDevice, ...{username: username, password: password}})
+    navigation.navigate("Device", { ...selectedDevice, ...{username: username, password: password}});
+  };
+
+  const selectDevice = (ip, name) => {
+    selectedDevice = {ip: ip, name: name};
+  }
+
   return (
-    <View style={{ flexDirection: "column", gap: 10, height: "100%" }}>
-      <View style={styles.content}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.h2}>network</Text>
-          <View style={styles.networkSwitch}>
-            <Pressable onPress={handleSwitchToggle}>
-              <Image
-                source={require("../assets/images/local-network.png")}
-                style={styles.smallIcon}
-                onPress={handleSwitchToggle}
-              />
-            </Pressable>
-            <Switch value={!isLocal} onValueChange={handleSwitchToggle} />
-            <Pressable onPress={handleSwitchToggle}>
-              <Image
-                source={require("../assets/images/outer-network.png")}
-                style={styles.smallIcon}
-                onPress={handleSwitchToggle}
-              />
-            </Pressable>
+    <>
+      <View style={{ flexDirection: "column", gap: 10, height: "100%" }}>
+        <View style={styles.content}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.h2}>network</Text>
+            <View style={styles.networkSwitch}>
+              <Pressable onPress={handleSwitchToggle}>
+                <Image
+                  source={require("../assets/images/local-network.png")}
+                  style={styles.smallIcon}
+                  onPress={handleSwitchToggle}
+                />
+              </Pressable>
+              <Switch value={!isLocal} onValueChange={handleSwitchToggle} />
+              <Pressable onPress={handleSwitchToggle}>
+                <Image
+                  source={require("../assets/images/outer-network.png")}
+                  style={styles.smallIcon}
+                  onPress={handleSwitchToggle}
+                />
+              </Pressable>
+            </View>
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={{ ...styles.input, ...styles.ipInput }}
+              value={!ip ? '' : generateNetworkAddress(ip, mask)}
+              onChangeText={setIp}
+              editable={!isLocal}
+              placeholder="enter network ip"
+              placeholderTextColor="#606060"
+            />
+            <TextInput
+              style={{ ...styles.input, ...styles.maskInput }}
+              value={mask}
+              onChangeText={setMask}
+              editable={!isLocal}
+              placeholder="mask"
+              placeholderTextColor="#606060"
+            />
+            <TouchableOpacity style={{ ...styles.smBtn, aspectRatio: 1 }} onPress={scanAllIPs}>
+              <Icon name="caret-forward-outline" size={20} color="black" />
+            </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={{ ...styles.input, ...styles.ipInput }}
-            value={!ip ? '' : generateNetworkAddress(ip, mask)}
-            onChangeText={setIp}
-            editable={!isLocal}
-            placeholder="enter network ip"
-            placeholderTextColor="#606060"
-          />
-          <TextInput
-            style={{ ...styles.input, ...styles.maskInput }}
-            value={mask}
-            onChangeText={setMask}
-            editable={!isLocal}
-            placeholder="mask"
-            placeholderTextColor="#606060"
-          />
-          <TouchableOpacity style={{ ...styles.smBtn, aspectRatio: 1 }} onPress={scanAllIPs}>
-            <Icon name="caret-forward-outline" size={20} color="black" />
-          </TouchableOpacity>
+        <View style={{ ...styles.content, flex: 1, flexDirection: "column" }}>
+          <View style={{ ...styles.titleContainer,  marginBottom: 7 }}>
+            <Text style={styles.h2}>devices{Object.keys(devices).length ? ` (${Object.keys(devices).length})` : ''}</Text>
+            <Text style={styles.h3}>{scanned} / {calculateNumberOfHosts(mask)}</Text>
+          </View>
+          <ScrollView contentContainerStyle={{ rowGap: 5, flexGrow: 1 }}>
+            {Object.keys(devices).length ? Object.entries(devices).map(([deviceIp, deviceName]) => {
+              return (
+                <DeviceRow ip={deviceIp} key={deviceIp} name={deviceName + (deviceIp == ownIp? " (You)" : "")} setModalVisible={setModalVisible} onPress={selectDevice(deviceIp, deviceName + (deviceIp == ownIp? " (You)" : ""))}/>
+              );
+            }) : <View style={{height: 100, width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "center"}}><Text>scan the network</Text></View>}
+          </ScrollView>
         </View>
       </View>
-      <View style={{ ...styles.content, flex: 1, flexDirection: "column" }}>
-        <View style={{ ...styles.titleContainer,  marginBottom: 7 }}>
-          <Text style={styles.h2}>devices{Object.keys(devices).length ? ` (${Object.keys(devices).length})` : ''}</Text>
-          <Text style={styles.h3}>{scanned} / {calculateNumberOfHosts(mask)}</Text>
+
+      <Modal visible={modalVisible} animationType="fade" transparent>
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+          <View style={{ backgroundColor: "white", borderRadius: 10, padding: 20, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5 }}>
+            <View style={{ alignItems: "center" }}>
+              <Text style={{ fontWeight: "bold", fontSize: 20, marginBottom: 10, marginTop: -5 }}>SSH Credentials</Text>
+              <TextInput
+                style={{ ...styles.input, width: "100%", marginBottom: 10 }}
+                placeholder="Username"
+                value={username}
+                onChangeText={setUsername}
+              />
+              <TextInput
+                style={{ ...styles.input, width: "100%" }}
+                placeholder="Password"
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+              />
+              <TouchableOpacity style={styles.lgBtn} onPress={handleModalSubmit}>
+                <Text style={{ color: "white", fontWeight: "bold", textAlign: "center" }}>Submit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.lgBtn} onPress={() => setModalVisible(false)}>
+                <Text style={{ color: "white", fontWeight: "bold", textAlign: "center" }}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
-        <ScrollView contentContainerStyle={{ rowGap: 5, flexGrow: 1 }}>
-          {Object.keys(devices).length ? Object.entries(devices).map(([deviceIp, deviceName]) => {
-            return (
-              <DeviceRow ip={deviceIp} key={deviceIp} name={deviceName + (deviceIp == ownIp? " (You)" : "")}/>
-            );
-          }) : <View style={{height: 100, width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "center"}}><Text>scan the network</Text></View>}
-        </ScrollView>
-      </View>
-    </View>
+      </Modal>
+    </>
   );
 };

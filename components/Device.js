@@ -11,15 +11,16 @@ import { useEffect } from "react";
 const { SSHConnector } = NativeModules;
 
 const Device = (props) => {
+  console.log(props.route.params);
   const navigation = useNavigation();
-  let { name, ip } = props.route.params;
+  let { name, ip, username, password } = props.route.params;
   const [rtt, setRtt] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [commandOutput, setCommandOutput] = useState('');
   const [firmwareModel, setFirmwareModel] = useState('');
   const [firmwareVersion, setFirmwareVersion] = useState('');
   const [uptime, setUptime] = useState('');
-  const [console, setConsole] = useState('');
+  const [consoleText, setConsoleText] = useState('');
 
 
   const getRtt = async () => {
@@ -35,7 +36,7 @@ const Device = (props) => {
     getRtt();
     (async () => {
       try {
-        const commandOutput = await SSHConnector.executeCommand(ip, 22, 'username', 'password', 'show version');
+        const commandOutput = await SSHConnector.executeCommand(ip, 22, username, password, 'show version');
         const firmwareMatch = commandOutput.match(/Cisco IOS Software, ([\S\s]*?), Version ([\S\s]*?),/);
         const modelMatch = firmwareMatch && firmwareMatch[1].trim();
         const versionMatch = firmwareMatch && firmwareMatch[2].trim();
@@ -60,8 +61,8 @@ const Device = (props) => {
       case 'interfaces':
         command = 'show ip interface brief';
         try {
-          const output = await SSHConnector.executeCommand(ip, 22, 'username', 'password', command);
-          setConsole(prev => prev + `\n${output}`);
+          const output = await SSHConnector.executeCommand(ip, 22, username, password, command);
+          setConsoleText(prev => prev + `\n${output}`);
           const interfaces = output.split('\n').slice(2).map(line => line.trim().split(/\s+/));
           const interfaceContent = interfaces.map(([name, ip, ok, protocol, status]) => (
         <View key={name} style={styles.detailRow}>
@@ -79,8 +80,8 @@ const Device = (props) => {
       case 'map':
         command = 'show ip route';
         try {
-          const output = await SSHConnector.executeCommand(ip, 22, 'username', 'password', command);
-          setConsole(prev => prev + `\n${output}`);
+          const output = await SSHConnector.executeCommand(ip, 22, username, password, command);
+          setConsoleText(prev => prev + `\n${output}`);
           const routes = output.split('\n').slice(13).map(line => line.trim().split(/\s+/));
           const routeContent = routes.map((route, i) => (
           <View key={i} style={styles.detailRow}>
@@ -104,7 +105,7 @@ const Device = (props) => {
     }
 
     // try {
-    //   const output = await SSHConnector.executeCommand(ip, 22, 'username', 'password', command);
+    //   const output = await SSHConnector.executeCommand(ip, 22, username, password, command);
     //   setCommandOutput(output);
     // } catch (error) {
     //   console.error('SSH Command Error:', error);
@@ -149,12 +150,12 @@ const Device = (props) => {
           <View style={{ flex: 0.6, padding: 10, marginVertical: 10, backgroundColor: "#fafafa", borderWidth: 1, borderRadius: 4, elevation: 3, borderColor: "#a0a0a0", flexDirection: "column", gap: 5 }}>
             {commandOutput}
           </View>
-          <View style={{ flex: 0.4, padding: 10, borderRadius: 5, backgroundColor: "#1f1f1f", fontWeight: "bold", color: "#ffffff"}}>
+          <View style={{ flex: 0.4, padding: 10, borderRadius: 5, backgroundColor: "#1f1f1f", fontWeight: "bold", color: "#ffffff", elevation: 3}}>
             <Text style={{ color: "#f1f1f1", marginTop: -5, fontWeight: "bold" }}>console</Text>
             <ScrollView ref={ref => {this.scrollView = ref}}
     onContentSizeChange={() => this.scrollView.scrollToEnd({animated: true})}>
               <Text style={{color: "white", fontSize: 10}}>
-                {console}
+                {consoleText}
               </Text>
             </ScrollView>
           </View>
