@@ -37,9 +37,7 @@ export default Dashboard = () => {
   const eventEmitter = new NativeEventEmitter(ParallelPing);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  // const [selectedDevice, setSelectedDevice] = useState({});
-
-  let selectedDevice = {};
+  const [selectedDevice, setSelectedDevice] = useState({});
 
   const [ownIp, setOwnIp] = useState("");
 
@@ -178,12 +176,8 @@ export default Dashboard = () => {
   const handleModalSubmit = () => {
     setModalVisible(false);
     console.log( { ...selectedDevice, ...{username: username, password: password}})
-    navigation.navigate("Device", { ...selectedDevice, ...{username: username, password: password}});
+    navigation.navigate("Device", {name: selectedDevice.deviceName, ip: selectedDevice.deviceIp, username: username, password: password});
   };
-
-  const selectDevice = (ip, name) => {
-    selectedDevice = {ip: ip, name: name};
-  }
 
   return (
     <>
@@ -239,7 +233,7 @@ export default Dashboard = () => {
           <ScrollView contentContainerStyle={{ rowGap: 5, flexGrow: 1 }}>
             {Object.keys(devices).length ? Object.entries(devices).map(([deviceIp, deviceName]) => {
               return (
-                <DeviceRow ip={deviceIp} key={deviceIp} name={deviceName + (deviceIp == ownIp? " (You)" : "")} setModalVisible={setModalVisible} onPress={selectDevice(deviceIp, deviceName + (deviceIp == ownIp? " (You)" : ""))}/>
+                <DeviceRow ip={deviceIp} key={deviceIp} name={deviceName + (deviceIp == ownIp? " (You)" : "")} setModalVisible={setModalVisible} setSelectedDevice={setSelectedDevice}/>
               );
             }) : <View style={{height: 100, width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "center"}}><Text>scan the network</Text></View>}
           </ScrollView>
@@ -251,25 +245,31 @@ export default Dashboard = () => {
           <View style={{ backgroundColor: "white", borderRadius: 10, padding: 20, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5 }}>
             <View style={{ alignItems: "center" }}>
               <Text style={{ fontWeight: "bold", fontSize: 20, marginBottom: 10, marginTop: -5 }}>SSH Credentials</Text>
+              <Text style={{color: "black"}}>ip: {selectedDevice.deviceIp}</Text>
+              <Text style={{color: "black"}}>name: {selectedDevice.deviceName}</Text>
               <TextInput
                 style={{ ...styles.input, width: "100%", marginBottom: 10 }}
                 placeholder="Username"
+                placeholderTextColor="#606060"
                 value={username}
                 onChangeText={setUsername}
               />
               <TextInput
                 style={{ ...styles.input, width: "100%" }}
                 placeholder="Password"
+                placeholderTextColor="#606060"
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}
               />
-              <TouchableOpacity style={styles.lgBtn} onPress={handleModalSubmit}>
-                <Text style={{ color: "white", fontWeight: "bold", textAlign: "center" }}>Submit</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.lgBtn} onPress={() => setModalVisible(false)}>
-                <Text style={{ color: "white", fontWeight: "bold", textAlign: "center" }}>Cancel</Text>
-              </TouchableOpacity>
+              <View style={{flexDirection: "row", gap: 5, marginTop: 10}}>
+                <TouchableOpacity style={styles.smBtn} onPress={handleModalSubmit}>
+                  <Text style={{ color: "black", fontWeight: "bold", textAlign: "center" }}>Submit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.smBtn} onPress={() => setModalVisible(false)}>
+                  <Text style={{ color: "black", fontWeight: "bold", textAlign: "center" }}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
@@ -277,3 +277,6 @@ export default Dashboard = () => {
     </>
   );
 };
+
+
+

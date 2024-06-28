@@ -1,12 +1,12 @@
 
 import Icon from "react-native-vector-icons/Ionicons"
-import React, { useState } from "react";
+import { React, useState, useEffect } from "react";
 import { View, TouchableOpacity, NativeModules, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import styles from "../assets/styles/styles";
 import Ping from 'react-native-ping';
 import Text from "./CText";
-import { useEffect } from "react";
+import { Modal, TextInput } from "react-native";
 
 const { SSHConnector } = NativeModules;
 
@@ -34,6 +34,7 @@ const Device = (props) => {
 
   useEffect(() => {
     getRtt();
+    handleOptionPress('interfaces');
     (async () => {
       try {
         const commandOutput = await SSHConnector.executeCommand(ip, 22, username, password, 'show version');
@@ -117,7 +118,26 @@ const Device = (props) => {
     return {commandOutput};
   };
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [command, setCommand] = useState('');
+
+  const handleModalSubmit = async () => {
+    try {
+      const output = await SSHConnector.executeCommand(ip, 22, username, password, command);
+      setConsoleText(prev => prev + `\n${output}`);
+    } catch (error) {
+      console.error('SSH Command Error:', error);
+      setConsoleText(prev => prev + '\nError executing command');
+    }
+    setModalVisible(false);
+  };
+
+  const handleConsolePress = () => {
+    setModalVisible(true);
+  };
+
   return (
+    <>
     <View style={{ flexDirection: "column", gap: 10, height: "100%" }}>
       <View style={{ ...styles.content, flex: 1, flexDirection: "column" }}>
         <View style={{ ...styles.titleContainer,  marginBottom: 7 }}>
@@ -150,7 +170,9 @@ const Device = (props) => {
           <View style={{ flex: 0.6, padding: 10, marginVertical: 10, backgroundColor: "#fafafa", borderWidth: 1, borderRadius: 4, elevation: 3, borderColor: "#a0a0a0", flexDirection: "column", gap: 5 }}>
             {commandOutput}
           </View>
-          <View style={{ flex: 0.4, padding: 10, borderRadius: 5, backgroundColor: "#1f1f1f", fontWeight: "bold", color: "#ffffff", elevation: 3}}>
+
+
+          {/* <View style={{ flex: 0.4, padding: 10, borderRadius: 5, backgroundColor: "#1f1f1f", fontWeight: "bold", color: "#ffffff", elevation: 3}}>
             <Text style={{ color: "#f1f1f1", marginTop: -5, fontWeight: "bold" }}>console</Text>
             <ScrollView ref={ref => {this.scrollView = ref}}
     onContentSizeChange={() => this.scrollView.scrollToEnd({animated: true})}>
@@ -158,10 +180,47 @@ const Device = (props) => {
                 {consoleText}
               </Text>
             </ScrollView>
+          </View> */}
+
+    
+          <TouchableOpacity onPress={handleConsolePress} style={{ flex: 0.4, padding: 10, borderRadius: 5, backgroundColor: "#1f1f1f", fontWeight: "bold", color: "#ffffff", elevation: 3}}>
+          <Text style={{ color: "#f1f1f1", marginTop: -5, fontWeight: "bold" }}>console</Text>
+          <ScrollView ref={ref => {this.scrollView = ref}} onContentSizeChange={() => this.scrollView.scrollToEnd({animated: true})}>
+            <Text style={{color: "white", fontSize: 10}}>
+              {consoleText}
+            </Text>
+          </ScrollView>
+        </TouchableOpacity>
+
+        </View>
+      </View>
+    </View>
+
+  <Modal visible={modalVisible} animationType="fade" transparent>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+      <View style={{ backgroundColor: "white", borderRadius: 10, padding: 20, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5 }}>
+        <View style={{ alignItems: "center" }}>
+          <Text style={{ fontWeight: "bold", fontSize: 20, marginBottom: 10, marginTop: -5 }}>SSH Command</Text>
+          <TextInput
+            style={{ ...styles.input, width: "100%" }}
+            placeholder="Command"
+            placeholderTextColor="#606060"
+            value={command}
+            onChangeText={setCommand}
+          />
+          <View style={{flexDirection: "row", gap: 5, marginTop: 10}}>
+            <TouchableOpacity style={styles.smBtn} onPress={handleModalSubmit}>
+              <Text style={{ color: "black", fontWeight: "bold", textAlign: "center" }}>Submit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.smBtn} onPress={() => setModalVisible(false)}>
+              <Text style={{ color: "black", fontWeight: "bold", textAlign: "center" }}>Cancel</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
     </View>
+  </Modal>
+    </>
   );
 };
 

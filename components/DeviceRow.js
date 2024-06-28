@@ -10,6 +10,7 @@ export default DeviceRow = (props) => {
 
   const handlePress = () => {
     props.setModalVisible(true);
+    props.setSelectedDevice({ deviceName: props.name, deviceIp: props.ip });
   };
 
   return (

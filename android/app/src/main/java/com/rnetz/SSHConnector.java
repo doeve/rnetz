@@ -40,31 +40,42 @@ public class SSHConnector extends ReactContextBaseJavaModule {
 
                     session.connect();
 
-                    Channel channel = session.openChannel("exec");
-                    ((ChannelExec) channel).setCommand(command);
-                    channel.setInputStream(null);
+Channel channel = session.openChannel("shell");
 
-                    InputStream in = channel.getInputStream();
-                    channel.connect();
+OutputStream outStream = channel.getOutputStream();
+PrintWriter shellWriter = new PrintWriter(outStream, true);
 
-                    byte[] tmp = new byte[1024];
-                    StringBuilder outputBuffer = new StringBuilder();
-                    while (true) {
-                        while (in.available() > 0) {
-                            int i = in.read(tmp, 0, 1024);
-                            if (i < 0) break;
-                            outputBuffer.append(new String(tmp, 0, i));
-                        }
-                        if (channel.isClosed()) {
-                            if (in.available() > 0) continue;
-                            System.out.println("exit-status: " + channel.getExitStatus());
-                            break;
-                        }
-                        try {
-                            Thread.sleep(1000);
-                        } catch (Exception ee) {
-                        }
-                    }
+InputStream inStream = channel.getInputStream();
+
+channel.connect();
+
+// Send the command followed by a newline to execute it
+shellWriter.println(command);
+shellWriter.flush();
+
+// Optionally, send the password the same way if needed
+// shellWriter.println("yourPassword");
+// shellWriter.flush();
+
+byte[] tmp = new byte[1024];
+StringBuilder outputBuffer = new StringBuilder();
+while (true) {
+    while (inStream.available() > 0) {
+        int i = inStream.read(tmp, 0, 1024);
+        if (i < 0) break;
+        outputBuffer.append(new String(tmp, 0, i));
+        System.out.println(new String(tmp, 0, i)); // Print each line as it is received
+    }
+    if (channel.isClosed()) {
+        if (inStream.available() > 0) continue;
+        System.out.println("exit-status: " + channel.getExitStatus());
+        break;
+    }
+    try {
+        Thread.sleep(1000);
+    } catch (Exception ee) {
+    }
+}
                     channel.disconnect();
                     session.disconnect();
                     promise.resolve(outputBuffer.toString());
