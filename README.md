@@ -14,44 +14,53 @@ NETZ is built using Meta's **React Native** framework. It leverages **npm** for 
 
 NETZ offers a robust set of features to manage and monitor your network:
 
-* **Parallel Network Discovery:** Efficiently scans both local and external networks if accessible.  
-* **Device Connection:** Connects to various networking devices.  
-* **Interface Listing:** Displays interfaces of connected devices along with their IP addresses and current status.  
-* **Network Map:** Provides a visual representation (map) of connected devices.  
+* **Parallel Network Discovery:** Efficiently scans both local and external networks if accessible.
+* **Device Connection:** Connects to various networking devices.
+* **Interface Listing:** Displays interfaces of connected devices along with their IP addresses and current status.
+* **Network Map:** Provides a visual representation (map) of connected devices.
 * **Configuration Export:** Allows exporting device configurations.
 
 ### **Scanning Capabilities**
 
 NETZ provides powerful scanning features:
 
-* Automatically detects local network addresses and appropriate masks.  
-* Scans local or external networks rapidly.  
+* Automatically detects local network addresses and appropriate masks.
+* Scans local or external networks rapidly.
 * Detects all devices supporting ICMP by parallelly pinging the entire network.
 
-![Discovered Devices Screen](https://i.postimg.cc/NyJnqTV3/discovered-devices.png)
-Fig. 1 \- Discovered Devices Screen
+<p align="center">
+  <img src="https://i.ibb.co/mC5hnqQv/discovered-devices.png" alt="Discovered Devices Screen" width="300">
+  <br>
+  Fig. 1 - Discovered Devices Screen
+</p>
 
 ### **Interfaces, Network Map & Configuration Management**
 
 Gain insights into your network interfaces, visualize your network, and manage configurations:
 
-* **Interfaces:** States the IP address and current status of each interface.  
-* **Network Map:** States the type of rule, IP address, and interface name of a route.  
+* **Interfaces:** States the IP address and current status of each interface.
+* **Network Map:** States the type of rule, IP address, and interface name of a route.
 * **Configuration:** Offers functionalities to start and export configurations.
 
-![Different Functionalities Overlaid](https://i.postimg.cc/8J701cgj/overlaid.png)
-Fig. 2 \- Different Functionalities Overlaid
+<p align="center">
+  <img src="https://i.ibb.co/LX7qVrd0/overlaid.png" alt="Different Functionalities Overlaid" width="300">
+  <br>
+  Fig. 2 - Different Functionalities Overlaid
+</p>
 
 ### **The Console**
 
 Access the raw output and send arbitrary commands directly to connected devices.
 
-* Can be accessed from the device screen.  
-* Displays raw returned data.  
+* Can be accessed from the device screen.
+* Displays raw returned data.
 * Allows reading and sending arbitrary commands to the connected device.
 
-![Showcasing Raw Output of Console](https://i.postimg.cc/xJBFqQ9g/raw-output.png)
-Fig. 3 \- Showcasing Raw Output of Console
+<p align="center">
+  <img src="https://i.ibb.co/XfGW39Tx/raw-output.png" alt="Showcasing Raw Output of Console" width="300">
+  <br>
+  Fig. 3 - Showcasing Raw Output of Console
+</p>
 
 ## **Testing**
 
@@ -61,8 +70,8 @@ The devices were tested on a virtual network created in GNS3. The cloud node con
 
 Future enhancements planned for NETZ include:
 
-* Automatically detecting local network addresses and appropriate masks.  
-* Scanning local or external networks rapidly when available.  
+* Automatically detecting local network addresses and appropriate masks.
+* Scanning local or external networks rapidly when available.
 * Detecting all devices which support ICMP by parallelly pinging the entire network.
 
 NETZ aims to be a comprehensive and intuitive tool for network professionals and enthusiasts, simplifying complex network management tasks.
